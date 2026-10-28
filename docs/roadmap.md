@@ -217,3 +217,11 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - 交接终稿 + 证据链底稿升级到 v0.1.3(容器演练故事入 I 节)
 - README 终检修三处:release 徽章 v0.1.3 / 状态行 Phase 2 complete /
   AgiBotWorld 语料 + quaternion_nonunit 规则(此前漏宣的第 4 语料)
+
+### r38: tarball validator 产品化 + 跨任务证据
+- scripts/validate_hub_tarball.py:流式提取 tabular 头即停(审计成本 MB 级);
+  本地 fixture 测试 51/51;教训×2:675 是 3GB 任务(data 段在 meta 前,超时
+  属正常→加进度输出);抢先 push 后发现失败→立刻补修提交(推前必验)
+- 泛化演练 task 705(未见过的任务):quaternion_nonunit 命中 dex[3:7]
+  (786/786,median 1.1148,CV 0.001)+ 夹爪双通道全冻结 → 四元数问题
+  跨任务/跨通道,已追加评论至 #164(经用户批准),附脚本链接
