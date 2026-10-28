@@ -45,6 +45,8 @@ elake serve --port 8317                        # HTTP API over the catalog
 
 # --- qc + scoring ------------------------------------------------------------
 elake qc ./ds_v30                          # structural PASS/FAIL, exit code 1 on error
+elake diff ./ds_v21 ./ds_v30 --expect-migration   # conversion validation: value-level
+                                           # (the check used against official pusht v3.0)
 elake score ./ds_v30 --min-score 80        # content rules: frozen joints, saturation,
                                            # action spikes, low-motion episodes
 ```

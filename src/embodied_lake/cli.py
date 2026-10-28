@@ -73,6 +73,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_ing.add_argument("--no-score", action="store_true")
     p_ing.add_argument("--catalog", default=None, help="catalog dir (default: .elake)")
 
+    p_diff = sub.add_parser("diff", help="compare two datasets (conversion validation)")
+    p_diff.add_argument("left", help="dataset A (e.g. v2.1 source)")
+    p_diff.add_argument("right", help="dataset B (e.g. converted v3.0)")
+    p_diff.add_argument("--expect-migration", action="store_true",
+                        help="treat version/path-template drift as expected (v2.1→v3.0)")
+
     p_score = sub.add_parser("score", help="content-level quality scoring (rules)")
     p_score.add_argument("src", help="local v3.0 dataset directory")
     p_score.add_argument("--json-out", default=None, help="write full report JSON here")
@@ -225,6 +231,13 @@ def main(argv: list[str] | None = None) -> int:
             cat.close()
         print(f"registered #{entry.id}: {entry.name} qc=PASS score={entry.mean_score}")
         return 0
+
+    if args.command == "diff":
+        from .qc.diff import diff_datasets
+
+        rep = diff_datasets(args.left, args.right, expect_migration=args.expect_migration)
+        print(rep.summary())
+        return 0 if rep.ok else 1
 
     if args.command == "score":
         from .qc.scoring import score_dataset
