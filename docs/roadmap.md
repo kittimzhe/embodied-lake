@@ -192,3 +192,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - scorer real-data catch: gripper velocity dims (6, 13) frozen/saturated across
   all episodes — anatomically correct, systematic (sensor/calibration quirk)
 - CLI cleanup: existing --include-qvel wired correctly (duplicate flag removed)
+
+### r29: Rerun engagement + comparison-rrd POC
+- rerun-io/rerun#12984 (compare two RRDs on shared timeline, needs triage):
+  posted experience-backed workaround (generation-time entity prefixes + delta
+  channel in a single rrd; POC verified 21KB with rerun 0.40 send_columns) —
+  offered examples/ recipe as follow-up contribution
+- r29 scan: LeRobot quiet; Rerun #12984 was the only adjacent item
