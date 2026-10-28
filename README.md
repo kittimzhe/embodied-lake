@@ -75,6 +75,35 @@ Reference: the LanceDB DROID full conversion (76k trajectories, incl. video +
 vector pipelines) runs 34 min — embodied-lake's tabular path is not the
 bottleneck; video handling is the open work (see roadmap).
 
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph sources["recordings (any robot stack)"]
+        MCAP["rosbag2 / MCAP"]
+        H5["ALOHA HDF5"]
+        V21["LeRobot v2.1"]
+    end
+    subgraph babel["Babel layer (elake convert)"]
+        direction TB
+        C1["v21_to_v30"]
+        C2["mcap_to_lerobot"]
+        C3["aloha_to_lerobot"]
+    end
+    V30["LeRobot v3.0 dataset"]
+    QC["QC (elake qc + score)"]
+    CAT["catalog (SQLite: lineage, verdicts)"]
+    API["elake serve (HTTP) / Docker Compose"]
+    RERUN["Rerun preview (.rrd)"]
+
+    MCAP --> C2 --> V30
+    H5 --> C3 --> V30
+    V21 --> C1 --> V30
+    V30 --> QC --> CAT --> API
+    V30 --> RERUN
+    CAT --> RERUN
+```
+
 ## Design notes
 
 - **Dependency-light by design**: conversion and QC need only

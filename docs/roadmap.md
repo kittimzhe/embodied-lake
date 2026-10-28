@@ -103,3 +103,13 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - `docker/Dockerfile` + `docker-compose.yml`: one-command on-prem
   (volumes: catalog state + datasets RO)
 - 4 API tests (live server on ephemeral port); 37/37 green
+
+### Candidate: OpenRAL/openral #250 (2026-10-28, r12) — READY, awaiting user approval
+- bug + help-wanted, unassigned, 0 comments, open since 2026-09-08; repo active (pushed 10-27)
+- AlohaHAL publishes ros2_control topics a real ALOHA doesn't have; issue author
+  established the xs_sdk contract and suggested the fix; repo docs/tests already
+  carry "move with the #250 fix" banners — maintainer-aligned
+- local fix implemented + verified: 27/27 of their unit tests pass
+  (patch: ../contributions/openral-250-aloha-xs-sdk.patch)
+- open design point to confirm in comment: gripper as motor group vs joint_single
+  (defaults to group "arm"/"gripper" per stock motor_config)
