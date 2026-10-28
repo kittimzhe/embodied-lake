@@ -121,3 +121,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
   (rosbag2/MCAP, ALOHA HDF5, LeRobot v2.1) are all covered and validated.
   Revisit if a concrete RLDS ingestion request lands.
 - Phase 1 declared functionally complete: 3 converters + qc/score + benchmark.
+
+### 2026-10-28 r13 — user approvals received; FIRST PRs OUT
+- private repo github.com/kittimzhe/embodied-lake (main, 21+ commits)
+- OpenRAL/openral#451 PR opened (fix #250, xs_sdk contract) + design-point comment
+- LeRobot #4368 RFC comment posted (converter landscape data point)
+- LeRobot #5130 example proposal opened (rosbag2→v3.0 recipe)
+- Draft B (#4443 converter-table entry) deferred until repo goes public
