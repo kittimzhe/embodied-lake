@@ -59,6 +59,11 @@ elake serve --port 8317                        # HTTP API + web catalog UI over 
 | `/api/datasets` (POST) | register a dataset from CI or scripts |
 | `/preview/*.rrd` | rendered Rerun episodes — opened in the hosted Rerun web viewer |
 
+`elake preview <ds> [--compare <reference>]` renders headlessly to `.rrd`; with
+`--compare` it emits `a`/`b`/`delta` channels per feature on a shared timeline
+(flat delta = output matches reference) — the pattern shared as a workaround
+recipe on [rerun#12984](https://github.com/rerun-io/rerun/issues/12984).
+
 `ingest` wires the whole pipeline: convert → QC gate → score → register.
 
 # --- qc + scoring ------------------------------------------------------------
