@@ -128,3 +128,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - LeRobot #4368 RFC comment posted (converter landscape data point)
 - LeRobot #5130 example proposal opened (rosbag2→v3.0 recipe)
 - Draft B (#4443 converter-table entry) deferred until repo goes public
+
+### r15-16: PR #451 CI/review loop
+- r15: DCO failure → fixed identity+signoff; quality failure (mkdocs --strict
+  griffe: stale docstring params) → fixed; quality SUCCESS
+- r16: CodeRabbit 3 Major findings (all valid) — single-namespace collision,
+  robot.yaml keys not wired to build_hal, docstring drift → all fixed in 3b9672f,
+  28/28 tests (+1 new namespace-validation test), reply posted
