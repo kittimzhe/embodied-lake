@@ -10,30 +10,35 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 authors = [{ name = "embodied-lake contributors" }]
-keywords = ["robotics", "embodied-ai", "lerobot", "datasets", "data-platform"]
-# Core keeps zero heavy dependencies on purpose (stdlib-only inspection).
-# Heavy integrations live in optional extras so the base CLI runs anywhere.
+keywords = ["robotics", "embodied-ai", "lerobot", "datasets", "data-platform", "mcap", "rerun"]
+# Core keeps zero heavy dependencies on purpose (stdlib-only inspection/catalog/API).
 dependencies = []
 
 [project.optional-dependencies]
-babel = [  # Phase 1: format conversion layer
-  "pyarrow>=15",          # parquet read/write (v2.1 -> v3.0 conversion)
-  "pandas>=2.0",          # upstream-compatible tasks.parquet artifact
-  "mcap>=1.2",            # MCAP container reading
-  "rosbags>=0.11",        # rosbag1/2 reading without a ROS install
-  "h5py>=3.10",           # ALOHA/robomimic HDF5 reading
-  "lerobot>=0.6.1",       # optional: full upstream dataset API (heavy)
+babel = [  # format conversion + QC/scoring: what `elake convert/qc/score/ingest` needs
+  "pyarrow>=15",            # parquet read/write (v2.1 -> v3.0 artifacts)
+  "pandas>=2.0",            # upstream-compatible tasks.parquet layout
+  "numpy>=1.24",            # stats aggregation + scoring rules
+  "mcap>=1.2",              # MCAP container reading
+  "mcap-ros2-support>=0.5", # CDR/ros2msg decoding (JointState etc.)
+  "h5py>=3.10",             # ALOHA/robomimic HDF5 reading
 ]
-qc = [  # Phase 1: quality-control pipeline
-  "flora-inference",      # NVIDIA Flora (rewarder/captioner/tempseg) — name TBD upstream
+viz = [  # `elake preview` (Rerun .rrd rendering)
+  "rerun-sdk>=0.20",
+  "pyarrow>=15",
 ]
 dev = [
   "pytest>=8",
   "ruff>=0.6",
 ]
+all = ["embodied-lake[babel,viz]"]
 
 [project.scripts]
 elake = "embodied_lake.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/kittimzhe/embodied-lake"
+Issues = "https://github.com/kittimzhe/embodied-lake/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/embodied_lake"]
