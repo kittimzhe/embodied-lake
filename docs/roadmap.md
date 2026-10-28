@@ -164,3 +164,8 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - PR 451: merge-commit CI ALL PASS incl. CodeRabbit re-review; new Major
   finding (no publish_fn on build_hal path) → loud connect() warning (repo
   fail-loudly philosophy), scope rationale posted, thread resolved
+
+### r24: ingest auto-snapshot integration
+- `elake ingest` now pins the dataset after the QC gate passes (message carries
+  mode + verdict + score); drill: 2 mcap -> 30 frames -> snapshot 7110f557 ->
+  verify OK; 45/45
