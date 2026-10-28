@@ -142,3 +142,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
   (25,650×10, stats aggregate consistent source-vs-output); 40/40 tests
 - PR #451: ruff PLR2004 (magic 2) → constant; one bad intermediate push
   (continuation-indent syntax) fixed in 05cd2b9; ruff clean + 28/28 local
+
+### r19: PR 451 mirror-parity fix (autopilot loop)
+- core_selected(0) failure = tests keep ALOHA_REAL_DESCRIPTION (in-code mirror)
+  in lockstep with robot.yaml → mirrored the three hal.parameters.defaults keys
+  into the constant (+HalParameters import); non-sim lanes 11/11 local
+- sim-lane failures verified pre-existing on clean master (optional deps) — not ours
+- quality trio (ruff check / format / targeted tests) before push, per lesson
