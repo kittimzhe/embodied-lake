@@ -108,7 +108,9 @@ def _flatten_episode_stats(stats: dict) -> dict[str, object]:
     """Flatten ``{feature: {stat: value}}`` -> ``stats/<feature>/<stat>`` columns.
 
     Passes through *all* stat keys present in the source (real-world v2.1
-    datasets carry min/max/mean/std/count **and** q01/q10/q50/q90/q99).
+    datasets carry min/max/mean/std/count **and** q01/q10/q50/q90/q99). Values
+    may be scalars (scalar features) or nested lists (vector/image features) —
+    both are passed through unchanged.
     """
     flat: dict[str, object] = {}
     for feature, s in stats.items():
@@ -117,16 +119,36 @@ def _flatten_episode_stats(stats: dict) -> dict[str, object]:
     return flat
 
 
-def aggregate_episode_stats(all_stats: list[dict]) -> dict:
-    """Count-weighted aggregation of per-episode feature stats.
+def _scalar_count(v) -> float:
+    """Real v2.1 stats store count as a 1-element list ([frames]) or scalar."""
+    import numpy as np
 
-    min/max: extremum of extremums; count: sum; mean/std: population moments
-    combined across episodes. ``std`` stays None when any episode lacks it.
+    return float(np.asarray(v, dtype=np.float64).reshape(-1)[0])
+
+
+def _jsonable(v):
+    """numpy scalar/array -> python scalar/nested lists (for stats.json)."""
+    import numpy as np
+
+    if isinstance(v, np.ndarray):
+        return v.tolist()
+    if isinstance(v, np.generic):
+        return v.item()
+    return v
+
+
+def aggregate_episode_stats(all_stats: list[dict]) -> dict:
+    """Element-wise, count-weighted aggregation over per-episode stats.
+
+    Real v2.1 datasets store vector features' stats as per-dimension lists
+    (image stats as nested lists); this implementation reduces element-wise so
+    any consistent shape works. Population std via combined second moments.
     """
+    import numpy as np
+
     features: set[str] = set()
     for stats in all_stats:
-        features.update(stats.keys())
-
+        features.update(stats)
     out: dict[str, dict] = {}
     for feature in sorted(features):
         mins, maxs, counts, means, stds = [], [], [], [], []
@@ -135,31 +157,42 @@ def aggregate_episode_stats(all_stats: list[dict]) -> dict:
             if not s:
                 continue
             if "min" in s:
-                mins.append(s["min"])
+                mins.append(np.asarray(s["min"], dtype=np.float64))
             if "max" in s:
-                maxs.append(s["max"])
+                maxs.append(np.asarray(s["max"], dtype=np.float64))
             if "count" in s:
-                counts.append(float(s["count"]))
+                counts.append(_scalar_count(s["count"]))
             if "mean" in s:
-                means.append((float(s["mean"]), float(s.get("count", 1))))
+                means.append(
+                    (np.asarray(s["mean"], dtype=np.float64), _scalar_count(s.get("count", 1)))
+                )
             if "std" in s:
-                stds.append((float(s["std"]), float(s["mean"]), float(s.get("count", 1))))
+                stds.append(
+                    (
+                        np.asarray(s["std"], dtype=np.float64),
+                        np.asarray(s["mean"], dtype=np.float64),
+                        _scalar_count(s.get("count", 1)),
+                    )
+                )
         agg: dict = {}
         if mins:
-            agg["min"] = min(mins)
+            agg["min"] = _jsonable(np.minimum.reduce(np.stack(mins)))
         if maxs:
-            agg["max"] = max(maxs)
+            agg["max"] = _jsonable(np.maximum.reduce(np.stack(maxs)))
         if counts:
-            agg["count"] = sum(counts)
+            agg["count"] = int(sum(counts))
         if means:
             n = sum(c for _, c in means)
-            agg["mean"] = sum(m * c for m, c in means) / n if n else None
+            agg["mean"] = _jsonable(sum(m * c for m, c in means) / n) if n else None
         if stds and "mean" in agg:
             n = sum(c for _, _, c in stds)
             m = agg["mean"]
-            # E[x^2] = var + mean^2 per episode, combined then centered.
             ex2 = sum((sd * sd + mu * mu) * c for sd, mu, c in stds) / n if n else None
-            agg["std"] = max(ex2 - m * m, 0.0) ** 0.5 if ex2 is not None else None
+            if ex2 is not None:
+                var = np.maximum(np.asarray(ex2) - np.asarray(m) ** 2, 0.0)
+                agg["std"] = _jsonable(np.sqrt(var))
+            else:
+                agg["std"] = None
         out[feature] = agg
     return out
 
@@ -194,6 +227,12 @@ def convert_v21_to_v30(
             k: ft for k, ft in (info.get("features") or {}).items() if ft.get("dtype") != "video"
         }
         payload["info"] = info
+        if payload["episode_stats"] is not None:
+            # stats of dropped features must not leak into the output artifacts
+            payload["episode_stats"] = {
+                ep_idx: {f: s for f, s in ep_stats.items() if f not in video_keys}
+                for ep_idx, ep_stats in payload["episode_stats"].items()
+            }
 
     if target.exists():
         shutil.rmtree(target)

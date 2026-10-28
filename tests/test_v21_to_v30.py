@@ -249,3 +249,33 @@ def test_convert_drop_videos(v21_dataset: Path, tmp_path: Path):
     assert "observation.image" not in new_info["features"]
     assert new_info["video_path"] is None
     assert new_info["video_files_size_in_mb"] is None
+
+
+def test_aggregate_vector_stats_elementwise():
+    """Real v2.1 datasets store vector-feature stats as per-dim lists (bugfix)."""
+    from embodied_lake.babel.v21_to_v30 import aggregate_episode_stats
+
+    all_stats = [
+        {  # ep0: 2 frames; state dim-2
+            "observation.state": {
+                "min": [0.0, 10.0], "max": [2.0, 12.0],
+                "mean": [1.0, 11.0], "std": [0.5, 0.5], "count": [2],
+            }
+        },
+        {  # ep1: 6 frames
+            "observation.state": {
+                "min": [4.0, 14.0], "max": [6.0, 16.0],
+                "mean": [5.0, 15.0], "std": [0.5, 0.5], "count": [6],
+            }
+        },
+    ]
+    agg = aggregate_episode_stats(all_stats)["observation.state"]
+    assert agg["min"] == [0.0, 10.0]
+    assert agg["max"] == [6.0, 16.0]
+    assert agg["count"] == 8
+    # weighted mean: (1*2+5*6)/8 = 4, (11*2+15*6)/8 = 14
+    assert agg["mean"] == [4.0, 14.0]
+    import math
+    # combining the CLAIMED per-episode stds: E[x2] = ((0.25+1)*2 + (0.25+25)*6)/8
+    # = 19.25; var = 19.25 - 4**2 = 3.25 -> std = sqrt(3.25)
+    assert all(math.isclose(v, math.sqrt(3.25), rel_tol=1e-9) for v in agg["std"])
