@@ -32,7 +32,10 @@ def stream_extract_tabular(url: str, out: Path) -> list[str]:
     )
     out.mkdir(parents=True, exist_ok=True)
     got: list[str] = []
-    resp = urllib.request.urlopen(url, timeout=60)
+    if Path(url).exists():  # local fixture path (tests / offline replay)
+        resp = open(url, "rb")  # noqa: SIM115
+    else:
+        resp = urllib.request.urlopen(url, timeout=60)
 
     class _Counting:
         """Progress-wrapping raw stream (MB read so far)."""
