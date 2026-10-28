@@ -56,6 +56,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_cat_ls = cat_sub.add_parser("list", help="list registered datasets")
     p_cat_ls.add_argument("--catalog", default=None, help="catalog dir (default: .elake)")
 
+    p_serve = sub.add_parser("serve", help="serve the catalog over HTTP (stdlib only)")
+    p_serve.add_argument("--catalog", default=None, help="catalog dir (default: .elake)")
+    p_serve.add_argument("--host", default="127.0.0.1")
+    p_serve.add_argument("--port", type=int, default=8317)
+
     p_ing = sub.add_parser("ingest", help="convert -> qc -> score -> catalog, one command")
     p_ing.add_argument("src", nargs="+")
     p_ing.add_argument("dst")
@@ -134,6 +139,13 @@ def main(argv: list[str] | None = None) -> int:
             )
         else:
             print(render(card))
+        return 0
+
+    if args.command == "serve":
+        from .platform.api import serve
+
+        print(f"serving catalog on http://{args.host}:{args.port} (ctrl-c to stop)")
+        serve(Path(args.catalog or ".elake"), host=args.host, port=args.port)
         return 0
 
     if args.command == "catalog":

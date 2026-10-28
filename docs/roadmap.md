@@ -96,3 +96,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - `elake ingest`: convert -> qc gate (exit 1 on structural failure) -> score
   -> register, one command; 4 e2e tests (33/33 green)
 - Real-data drill: pusht conversion output registered (#1, v3.0, qc=PASS, 100.0)
+
+### Self-hosted serving (2026-10-28, r11)
+- `elake serve`: stdlib HTTP API over the catalog (healthz, list/detail JSON,
+  POST register, static .rrd preview serving) — zero web-framework deps
+- `docker/Dockerfile` + `docker-compose.yml`: one-command on-prem
+  (volumes: catalog state + datasets RO)
+- 4 API tests (live server on ephemeral port); 37/37 green

@@ -40,6 +40,8 @@ elake convert hdf5-to-v30 episode_*.hdf5 ./ds         # ALOHA-style HDF5
 elake ingest rec_*.mcap ./ds --mode mcap-to-v30 --state-topic /arm/joint_states
 #            ^ convert -> structural qc gate -> score -> register (one command)
 elake catalog list                            # registry with qc verdicts + lineage
+elake serve --port 8317                        # HTTP API over the catalog
+# docker/docker-compose.yml                    # one-command on-prem deployment
 
 # --- qc + scoring ------------------------------------------------------------
 elake qc ./ds_v30                          # structural PASS/FAIL, exit code 1 on error

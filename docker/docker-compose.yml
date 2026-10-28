@@ -1,0 +1,14 @@
+# One-command on-prem embodied-lake deployment.
+#   docker compose up -d
+# API on http://localhost:8317 — catalog persisted in ./state, datasets mounted read-only.
+services:
+  elake:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8317:8317"
+    volumes:
+      - ./state:/var/lib/elake          # catalog.db lives here
+      - ${ELAKE_DATASETS:-./datasets}:/data:ro   # register paths under /data
+    restart: unless-stopped
