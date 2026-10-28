@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "embodied-lake"
+version = "0.1.0"
+description = "LeRobot-native, self-hosted data platform for embodied AI: format Babel layer, QC pipeline, dataset management."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "embodied-lake contributors" }]
+keywords = ["robotics", "embodied-ai", "lerobot", "datasets", "data-platform"]
+# Core keeps zero heavy dependencies on purpose (stdlib-only inspection).
+# Heavy integrations live in optional extras so the base CLI runs anywhere.
+dependencies = []
+
+[project.optional-dependencies]
+babel = [  # Phase 1: format conversion layer
+  "lerobot>=0.6.1",       # upstream dataset API (LeRobotDataset v2/v3)
+  "mcap>=1.2",            # MCAP container reading
+  "rosbags>=0.11",        # rosbag1/2 reading without a ROS install
+  "h5py>=3.10",           # ALOHA/robomimic HDF5 reading
+]
+qc = [  # Phase 1: quality-control pipeline
+  "flora-inference",      # NVIDIA Flora (rewarder/captioner/tempseg) — name TBD upstream
+]
+dev = [
+  "pytest>=8",
+  "ruff>=0.6",
+]
+
+[project.scripts]
+elake = "embodied_lake.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/embodied_lake"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
