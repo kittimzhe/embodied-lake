@@ -94,3 +94,25 @@ def test_low_motion_detected(tmp_path: Path) -> None:
     ])
     rep = score_dataset(root)
     assert any(f.check == "low_motion" for f in rep.episodes[2].findings)
+
+
+def test_quaternion_nonunit_rule(tmp_path):
+    """xyz+quat pose features with non-unit quaternions are flagged;
+    joint-angle-like groups (wandering norms) are not."""
+    import numpy as np
+    from embodied_lake.qc.scoring import score_episode
+
+    n = 200
+    t = np.linspace(0, 1, n)
+    # pose-like: xyz smooth + quat scaled to norm 1.2 (stable)
+    xyz = np.stack([t, 1 - t, 0.5 * np.ones(n)], axis=1)
+    q = np.stack([np.cos(t), np.sin(t) * 0.5, np.zeros(n), np.zeros(n)], axis=1)
+    q = q * (1.2 / np.linalg.norm(q, axis=1, keepdims=True))
+    pose = np.concatenate([xyz, q, np.zeros((n, 11))], axis=1)
+    sc = score_episode(0, {"observation.state.ee_base": pose})
+    assert any(f.check == "quaternion_nonunit" and "3:7" in f.detail for f in sc.findings)
+
+    # joint-angle-like: 4 dims with wandering norm (aloha qpos profile)
+    joints = np.stack([np.sin(t * 3), np.sin(t * 5 + 1), np.sin(t * 2), np.sin(t * 7)], axis=1)
+    sc2 = score_episode(1, {"observation.state.joint": joints})
+    assert not any(f.check == "quaternion_nonunit" for f in sc2.findings)

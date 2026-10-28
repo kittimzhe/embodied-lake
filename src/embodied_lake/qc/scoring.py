@@ -121,6 +121,32 @@ def score_episode(
                     10.0 * min(len(frozen), 3),
                 )
             )
+        # suspected non-unit quaternions in pose-like features: the standard
+        # xyz+quat layout puts the quaternion at dims [3:7] (AgiBotWorld
+        # ee_base/ee_camera finding, OpenDriveLab/AgiBot-World#164).
+        # Discriminators vs joint-angle groups (checked against real data):
+        # components bounded by 1.5, norm median in [0.95, 1.6], and a STABLE
+        # norm (CV < 0.2) — joint-angle norms wander with motion (real
+        # aloha qpos[3:7]: median 0.59, CV 0.55; AgiBot ee_camera[3:7]:
+        # median 1.25, CV ~0.05).
+        if m.shape[1] >= 7:
+            win = m[:, 3:7]
+            if np.max(np.abs(win)) <= 1.5:
+                norms = np.linalg.norm(win, axis=1)
+                med = float(np.median(norms))
+                cv = float(norms.std() / med) if med > 0 else 1.0
+                if 0.95 <= med <= 1.6 and cv < 0.2:
+                    off = int(np.sum(np.abs(norms - 1.0) > 1e-3))
+                    if off > 0.5 * m.shape[0]:
+                        findings.append(
+                            Finding(
+                                "quaternion_nonunit",
+                                f"{feat}[3:7]: suspected quaternion (xyz+quat layout),"
+                                f" norm deviates from 1 by >1e-3 in {off}/{m.shape[0]}"
+                                f" frames (median {med:.4f}, CV {cv:.3f})",
+                                10.0,
+                            )
+                        )
         # saturation: exact repeats of the per-dim extremum
         for d in range(m.shape[1]):
             lo = np.sum(m[:, d] == mins[d])
