@@ -6,6 +6,40 @@ adherence to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starts a
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-10-28
+
+### Added
+- **Snapshot integrity ledger** (`elake snapshot create/list/verify/diff`):
+  content-addressed pins over info/meta/data (per-file sha256 + row counts),
+  stored in the catalog DB so dataset trees stay byte-clean. Drift reports name
+  the exact file; `diff` gives file-level changesets between two pins —
+  manifest-only, so audits work after the tree is gone. `elake ingest` pins
+  automatically once the QC gate passes; API + web UI expose the latest hash.
+- **`elake preview --compare A B`**: renders two datasets into ONE `.rrd` with
+  `a`/`b`/`delta` channels per feature on a shared timeline (flat delta =
+  converter output matches reference). Same pattern shared upstream as a
+  workaround recipe on rerun-io/rerun#12984.
+- **Validation corpus #2**: `lerobot/aloha_sim_transfer_cube_human` (50 eps /
+  20k frames) — tasks, episodes metadata (49 cols), per-episode stats,
+  aggregate stats, and all 20,000×8 data rows value-identical vs the official
+  v3.0. Portability findings: Hub datasets disagree on tasks column naming
+  (`task` vs `__index_level_0__` — tools read both); `--drop-videos` legitimately
+  shifts shard boundaries (row set identical).
+- **Validation corpus #3**: real mobile-ALOHA HDF5 (`sumo43/mobile-aloha`) —
+  `qpos`/`qvel`/`action` round-trip **bit-exact** (max|Δ| = 0.0); the content
+  scorer's first real catch: gripper velocity dims (6/13 of 14) frozen/saturated
+  across every episode — anatomically correct, systematic.
+- **Scale rehearsal** (`scripts/scale_rehearsal.py`): 20k episodes / 4M rows /
+  174 MB synthetic v2.1 → 395k rows/s, QC PASS, source-diff IDENTICAL, output
+  correctly shards into 2 size-bounded data files.
+- Packaging: extras match reality (`babel`/`viz`/`all`); wheel + sdist attached
+  to the release; fresh-venv install verified.
+
+### Changed
+- Web catalog UI: `pinned` column (snapshot hash) and Rerun-viewer preview links.
+
+## [0.1.0] — 2026-10-28
+
 ### Added
 - `elake preview`: render a local v3.0 dataset to a standalone Rerun `.rrd`
   (per-episode scalar time series per feature dim) — Phase-2 episode preview
