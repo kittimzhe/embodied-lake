@@ -104,6 +104,8 @@ def build_parser() -> argparse.ArgumentParser:
                          help="exit 1 if any episode scores below this")
 
     p_prev = sub.add_parser("preview", help="render a dataset to a Rerun .rrd (headless)")
+    p_prev.add_argument("--compare", metavar="B", default=None,
+                        help="second dataset: render a/b channels + per-feature delta")
     p_prev.add_argument("src", help="local dataset directory (v3.0)")
     p_prev.add_argument("--out", default=None, help="output .rrd path (default: <dataset>.rrd)")
     p_prev.add_argument("--episodes", nargs="*", type=int, default=None, help="episode indices (default: all)")
@@ -334,9 +336,12 @@ def main(argv: list[str] | None = None) -> int:
         except ImportError:
             print("error: rerun-sdk required for preview (pip install rerun-sdk)", file=sys.stderr)
             return 1
-        from .viz.rrd import render_dataset
+        from .viz.rrd import render_comparison, render_dataset
 
-        out = render_dataset(args.src, args.out, args.episodes)
+        if args.compare:
+            out = render_comparison(args.src, args.compare, args.out)
+        else:
+            out = render_dataset(args.src, args.out, args.episodes)
         print(f"preview written: {out}")
         return 0
 

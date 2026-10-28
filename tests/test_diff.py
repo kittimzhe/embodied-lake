@@ -65,3 +65,14 @@ def test_meta_drift_detected(converted_pair) -> None:
     assert not rep.ok
     names = {s.name for s in rep.sections if not s.ok}
     assert "info" in names or "data rows" in names
+
+
+def test_render_comparison_rrd(converted_pair) -> None:
+    pytest.importorskip("rerun")
+    from embodied_lake.viz.rrd import render_comparison
+
+    ds, tmp = converted_pair
+    copy = tmp / "ds_copy_for_cmp"
+    shutil.copytree(ds, copy)
+    out = render_comparison(ds, copy, tmp / "cmp.rrd", episode=0)
+    assert out.stat().st_size > 0
