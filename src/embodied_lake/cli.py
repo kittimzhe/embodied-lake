@@ -29,6 +29,18 @@ def build_parser() -> argparse.ArgumentParser:
         "--json", action="store_true", help="emit the normalized card as JSON"
     )
 
+    p_convert = sub.add_parser("convert", help="convert between dataset formats")
+    csub = p_convert.add_subparsers(dest="converter", required=True)
+    p_v21 = csub.add_parser("v21-to-v30", help="LeRobot v2.1 -> v3.0 (video-free datasets)")
+    p_v21.add_argument("src", help="source dataset directory (v2.1)")
+    p_v21.add_argument("dst", help="destination dataset directory (v3.0)")
+    p_v21.add_argument(
+        "--size-mb",
+        type=float,
+        default=100.0,
+        help="target data-file size in MB before rolling over (default: 100)",
+    )
+
     return parser
 
 
@@ -63,6 +75,26 @@ def main(argv: list[str] | None = None) -> int:
             )
         else:
             print(render(card))
+        return 0
+
+    if args.command == "convert" and args.converter == "v21-to-v30":
+        try:
+            from .babel.v21_to_v30 import convert_v21_to_v30
+        except ImportError as exc:
+            print(f"error: missing optional dependency for conversion: {exc}", file=sys.stderr)
+            return 1
+        try:
+            report = convert_v21_to_v30(args.src, args.dst, data_file_size_in_mb=args.size_mb)
+        except Exception as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(
+            f"converted {report.episodes} episodes / {report.frames} frames "
+            f"-> {report.data_files_written} data file(s), {report.tasks} task(s); "
+            f"stats: {'yes' if report.has_stats else 'no'}"
+        )
+        for note in report.notes:
+            print(f"note: {note}")
         return 0
 
     return 2  # unreachable: subparsers are required
