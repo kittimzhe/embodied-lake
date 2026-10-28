@@ -113,3 +113,11 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
   (patch: ../contributions/openral-250-aloha-xs-sdk.patch)
 - open design point to confirm in comment: gripper as motor group vs joint_single
   (defaults to group "arm"/"gripper" per stock motor_config)
+
+### Phase 1 close-out decisions (2026-10-28, r13)
+- **RLDS→v3.0: DEFERRED to Phase 3.** Honest scope call: RLDS datasets are
+  TFRecord+protobuf with TFDS metadata; parsing without the TF stack is a
+  large surface for marginal benefit — the formats teams actually hand us
+  (rosbag2/MCAP, ALOHA HDF5, LeRobot v2.1) are all covered and validated.
+  Revisit if a concrete RLDS ingestion request lands.
+- Phase 1 declared functionally complete: 3 converters + qc/score + benchmark.
