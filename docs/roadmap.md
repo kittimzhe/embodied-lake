@@ -33,4 +33,17 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 ## Evidence ledger
 | Date | Artifact | Evidence |
 |---|---|---|
-| 2026-10-28 | inspector passes offline+network tests (v3.0 dataset card) | `pytest tests/` output |
+| 2026-10-28 | inspector passes offline+network tests (v3.0 dataset card) | `pytest tests/` 5/5 green |
+| 2026-10-28 | `elake inspect Embodied-AI-6/dataset` live Hub fetch works | CLI output: v3.0 / 160 ep / 81786 frames |
+| 2026-10-28 | git repo initialized, first commit | `8acd588` |
+
+## Contribution log (/contributor routine)
+| Date | Repo | Candidate | Status | Reason |
+|---|---|---|---|---|
+| 2026-10-28 | huggingface/lerobot | #2061, #1998 (good first) | excluded | both assigned (s1lent4gnt); #1998 = our Babel direction, watch & engage in comments |
+| 2026-10-28 | rerun-io/rerun | #11467 (update Rust deps) | excluded | claimed in comments (GeorgeLifinRell, maintainer replied) |
+| 2026-10-28 | rerun-io/rerun | #11269 (vcpkg docs) | excluded | maintainer marked blocked on upstream vcpkg package |
+| 2026-10-28 | huggingface/lerobot | #5116 (FastWAM docs) | excluded | commenter already wrote fix, PR imminent |
+| 2026-10-28 | huggingface/lerobot | #5105 (pi0 pad-in-loss bug) | excluded | PRs #5106/#5108 already open (claimed within 1 day of filing) |
+
+**Learnings (2026-10-28)**: LeRobot fresh well-scoped issues get claimed in ~24h → routine must run at high frequency; prefer issues where our Babel/QC work gives unique context (converters, MCAP/HDF5/RLDS ingestion) over generic drive-by fixes; policy check done (AGENTS.md + CONTRIBUTING.md present, AI-assisted contributions anticipated; uv, Python 3.12+, pre-commit ruff/mypy, pytest marks). Awaiting from user: GitHub username + target role before first fork/PR.
