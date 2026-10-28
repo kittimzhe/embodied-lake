@@ -169,3 +169,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - `elake ingest` now pins the dataset after the QC gate passes (message carries
   mode + verdict + score); drill: 2 mcap -> 30 frames -> snapshot 7110f557 ->
   verify OK; 45/45
+
+### r25: API snapshots + marker refresh discipline
+- feat: /api/datasets(+/{id}) carry latest snapshot hash; /api/datasets/{id}/
+  snapshots history; web UI "pinned" column (8-char hash, tooltip); 46/46
+- PR 451: warning commit re-shifted 01-hal.md line markers (6 stale) →
+  refreshed + full pre-push quartet (ruff/ruff fmt/markers/targeted tests);
+  321 passed locally across both suites
