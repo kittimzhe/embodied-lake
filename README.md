@@ -1,12 +1,12 @@
 # embodied-lake (working title)
 
 [![CI](https://github.com/kittimzhe/embodied-lake/actions/workflows/ci.yml/badge.svg)](https://github.com/kittimzhe/embodied-lake/actions/workflows/ci.yml)
-[![release](https://img.shields.io/badge/release-v0.1.2-blue)](https://github.com/kittimzhe/embodied-lake/releases/tag/v0.1.2)
+[![release](https://img.shields.io/badge/release-v0.1.3-blue)](https://github.com/kittimzhe/embodied-lake/releases/tag/v0.1.3)
 [![license](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
 > LeRobot-native, self-hostable data platform for embodied AI — an open alternative to the (closed-source) Foxglove Data Platform, built on the [LeRobot dataset format](https://huggingface.co/docs/lerobot/lerobot-dataset-v3) (the de-facto standard: 5,750+ datasets on the Hugging Face Hub) and [Rerun](https://github.com/rerun-io/rerun) as the multimodal data layer.
 
-**Status: Phase 1 — Babel layer + QC.** See [docs/roadmap.md](docs/roadmap.md).
+**Status: Phase 2 complete — Babel layer + QC + self-hosted management (catalog, snapshots, web UI). Phase 3 (dataset intelligence) underway.** See [docs/roadmap.md](docs/roadmap.md).
 
 ## Why
 
@@ -95,6 +95,15 @@ content scorer earned its keep on real hardware data: it flagged exactly the two
 episode — anatomically correct indices, systematic across the corpus, the kind of
 sensor/calibration quirk you want surfaced before training. (Camera images are
 skipped with a note in this revision; `--include-qvel` emits velocities.)
+
+**Dataset #4 — cross-project QC**: [AgiBotWorld-Beta](https://github.com/OpenDriveLab/AgiBot-World/issues/164)
+(task 676, 751 frames, tabular stream-extracted without downloading videos):
+the `quaternion_nonunit` rule reproduces the community-reported non-unit
+quaternion norms **digit-for-digit** (ee_base 663/751 @ 1.0070, ee_camera
+737/751 @ 1.2481), extends them to the `action.*` counterparts, and
+independently confirms the frozen placeholder channels — while staying silent
+on joint-angle groups (norm-stability discriminator) and on the three corpora
+above.
 
 The v2.1→v3.0 converter's output was compared, artifact by artifact, with the
 **official** v3.0 conversion of [`lerobot/pusht`](https://huggingface.co/datasets/lerobot/pusht)
