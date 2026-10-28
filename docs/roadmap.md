@@ -207,3 +207,8 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
   (ee_base 663/751 @ 1.0070, ee_camera 737/751 @ 1.2481), extends to action.*
   counterparts + frozen channels; calibrated zero-FP on 3 real corpora; 50/50
 - independent-verification comment posted (user-approved) — 国内项目 foothold
+
+### r35: 交接终稿
+- workspace-level embodied-lake-交接终稿.md:项目状态(4 语料×3 发版)、
+  四线贡献管线的精确跟进动作(每条含 URL+一键操作)、证据链压缩版(3 条
+  最强主张+硬证据)、目标后节奏建议
