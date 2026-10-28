@@ -83,3 +83,9 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - mcap→v3.0 synthetic 10k JointState frames (CDR decode dominates): 0.16 s →
   **61,369 rows/s**; extrapolation ~6 min
 - Public reference: LanceDB full DROID conversion 34 min (video+vector incl.)
+
+### QC scoring record (2026-10-28, r9)
+- `elake score`: rule engine live — frozen_dim / saturated / action_spike (robust
+  z) / low_motion (dataset-median energy reference); 4 detector tests green
+- Real-data calibration: lerobot/pusht conversion output → 206/206 episodes
+  score 100.0, zero false positives (clean sim benchmark)

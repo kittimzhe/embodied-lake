@@ -36,8 +36,10 @@ elake convert mcap-to-v30 rec_*.mcap ./ds \
     --state-topic /arm/joint_states --action-topic /arm/command   # rosbag2/MCAP
 elake convert hdf5-to-v30 episode_*.hdf5 ./ds         # ALOHA-style HDF5
 
-# --- qc: structural validation ----------------------------------------------
-elake qc ./ds_v30                          # PASS/FAIL + issues, exit code 1 on error
+# --- qc + scoring ------------------------------------------------------------
+elake qc ./ds_v30                          # structural PASS/FAIL, exit code 1 on error
+elake score ./ds_v30 --min-score 80        # content rules: frozen joints, saturation,
+                                           # action spikes, low-motion episodes
 ```
 
 ## Validated against real data

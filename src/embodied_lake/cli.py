@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from .inspect import inspect as inspect_dataset
 from .inspect import render
@@ -45,6 +46,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="convert tabular data only; drop video features instead of failing",
     )
+
+    p_score = sub.add_parser("score", help="content-level quality scoring (rules)")
+    p_score.add_argument("src", help="local v3.0 dataset directory")
+    p_score.add_argument("--json-out", default=None, help="write full report JSON here")
+    p_score.add_argument("--min-score", type=float, default=None,
+                         help="exit 1 if any episode scores below this")
 
     p_prev = sub.add_parser("preview", help="render a dataset to a Rerun .rrd (headless)")
     p_prev.add_argument("src", help="local dataset directory (v3.0)")
@@ -106,6 +113,25 @@ def main(argv: list[str] | None = None) -> int:
             )
         else:
             print(render(card))
+        return 0
+
+    if args.command == "score":
+        from .qc.scoring import score_dataset
+
+        rep = score_dataset(args.src)
+        flagged = [e for e in rep.episodes if e.findings]
+        for e in sorted(rep.episodes, key=lambda x: x.score)[:10]:
+            for f in e.findings:
+                print(f"ep {e.episode_index:<5} score={e.score:<6.1f} {f.check}: {f.detail}")
+        print(
+            f"{rep.dataset}: {len(rep.episodes)} episodes scored, mean {rep.mean_score:.1f}, "
+            f"{len(flagged)} episode(s) with findings"
+        )
+        if args.json_out:
+            Path(args.json_out).write_text(rep.to_json())
+            print(f"report: {args.json_out}")
+        if args.min_score is not None and any(e.score < args.min_score for e in rep.episodes):
+            return 1
         return 0
 
     if args.command == "preview":
