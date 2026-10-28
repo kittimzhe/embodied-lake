@@ -82,6 +82,15 @@ this run, now handled: official datasets disagree on the tasks column name
 differ when videos are dropped (tabular-only output legitimately packs into
 fewer size-bounded files; the row set is identical).
 
+**Dataset #3 — real mobile-ALOHA HDF5** (`sumo43/mobile-aloha`, 3 eps / 4,500 frames,
+14-DoF + mobile base, JPEG-compressed camera streams): the HDF5 converter round-trips
+`qpos`/`qvel`/`action` **bit-exactly** (max|Δ| = 0.0 on all three streams), and the
+content scorer earned its keep on real hardware data: it flagged exactly the two
+**gripper** velocity channels (dims 6 and 13 of 14) as frozen/saturated across every
+episode — anatomically correct indices, systematic across the corpus, the kind of
+sensor/calibration quirk you want surfaced before training. (Camera images are
+skipped with a note in this revision; `--include-qvel` emits velocities.)
+
 The v2.1→v3.0 converter's output was compared, artifact by artifact, with the
 **official** v3.0 conversion of [`lerobot/pusht`](https://huggingface.co/datasets/lerobot/pusht)
 (206 episodes / 25,650 frames) on the Hub:

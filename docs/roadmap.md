@@ -185,3 +185,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
   (task vs __index_level_0__) — our diff/inspect tolerate both;
   (b) drop-videos changes shard boundaries legitimately (row set identical)
 - related-work note added to #5130 (lerobot-doctor)
+
+### r28: third real corpus (mobile-ALOHA HDF5) — converter #3 validated
+- real sumo43/mobile-aloha (3×1500 frames, 14-DoF): convert 0.8s, qc PASS
+- fidelity: state/velocity/action max|Δ| = 0.0 (bit-exact)
+- scorer real-data catch: gripper velocity dims (6, 13) frozen/saturated across
+  all episodes — anatomically correct, systematic (sensor/calibration quirk)
+- CLI cleanup: existing --include-qvel wired correctly (duplicate flag removed)

@@ -223,7 +223,10 @@ def main(argv: list[str] | None = None) -> int:
         else:
             from .babel.aloha_to_lerobot import AlohaMapping, convert_aloha_to_v30
 
-            mapping = AlohaMapping(task=args.task or "manipulation demo", fps=args.fps or 50)
+            mapping = AlohaMapping(
+                task=args.task or "manipulation demo", fps=args.fps or 50,
+                include_qvel=args.include_qvel,
+            )
             rep = convert_aloha_to_v30(args.src, args.dst, mapping)
             lineage.update({"source": ",".join(args.src), "converter": "aloha_to_v30"})
             print(f"converted: {rep.episodes} episodes / {rep.frames} frames")
