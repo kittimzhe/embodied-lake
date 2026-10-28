@@ -41,6 +41,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="target data-file size in MB before rolling over (default: 100)",
     )
 
+    p_mcap = csub.add_parser("mcap-to-v30", help="MCAP (rosbag2) -> LeRobot v3.0")
+    p_mcap.add_argument("src", nargs="+", help="one or more .mcap files (one episode each)")
+    p_mcap.add_argument("dst", help="destination dataset directory (v3.0)")
+    p_mcap.add_argument("--state-topic", required=True, help="topic providing observation.state")
+    p_mcap.add_argument("--action-topic", default=None, help="topic providing action (default: mirror state)")
+    p_mcap.add_argument("--state-field", default="position", help="message field to extract (default: position)")
+    p_mcap.add_argument("--task", default="demonstration", help="task label for all episodes")
+    p_mcap.add_argument("--fps", type=int, default=30)
+    p_mcap.add_argument("--robot-type", default=None)
+
     return parser
 
 
@@ -93,6 +103,35 @@ def main(argv: list[str] | None = None) -> int:
             f"-> {report.data_files_written} data file(s), {report.tasks} task(s); "
             f"stats: {'yes' if report.has_stats else 'no'}"
         )
+        for note in report.notes:
+            print(f"note: {note}")
+        return 0
+
+    if args.command == "convert" and args.converter == "mcap-to-v30":
+        try:
+            from .babel.mcap_to_lerobot import McapMapping, convert_mcap_to_v30
+        except ImportError as exc:
+            print(f"error: missing optional dependency for conversion: {exc}", file=sys.stderr)
+            return 1
+        mapping = McapMapping(
+            state_topic=args.state_topic,
+            action_topic=args.action_topic,
+            state_field=args.state_field,
+            task=args.task,
+            fps=args.fps,
+            robot_type=args.robot_type,
+        )
+        try:
+            report = convert_mcap_to_v30(args.src, args.dst, mapping)
+        except Exception as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(
+            f"converted {len(report.files)} file(s): {report.episodes} episodes / "
+            f"{report.frames} frames; task='{args.task}'"
+        )
+        for t in report.skipped_topics:
+            print(f"skipped undecodable topic: {t}")
         for note in report.notes:
             print(f"note: {note}")
         return 0
