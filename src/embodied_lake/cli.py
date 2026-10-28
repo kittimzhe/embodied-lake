@@ -40,6 +40,14 @@ def build_parser() -> argparse.ArgumentParser:
         default=100.0,
         help="target data-file size in MB before rolling over (default: 100)",
     )
+    p_v21.add_argument(
+        "--drop-videos",
+        action="store_true",
+        help="convert tabular data only; drop video features instead of failing",
+    )
+
+    p_qc = sub.add_parser("qc", help="structural quality checks on a local dataset")
+    p_qc.add_argument("src", help="dataset directory")
 
     p_mcap = csub.add_parser("mcap-to-v30", help="MCAP (rosbag2) -> LeRobot v3.0")
     p_mcap.add_argument("src", nargs="+", help="one or more .mcap files (one episode each)")
@@ -95,6 +103,15 @@ def main(argv: list[str] | None = None) -> int:
             print(render(card))
         return 0
 
+    if args.command == "qc":
+        from .qc.structural import qc_dataset
+
+        report = qc_dataset(args.src)
+        for issue in report.issues:
+            print(str(issue))
+        print(report.summary())
+        return 0 if report.ok else 1
+
     if args.command == "convert" and args.converter == "v21-to-v30":
         try:
             from .babel.v21_to_v30 import convert_v21_to_v30
@@ -102,7 +119,11 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: missing optional dependency for conversion: {exc}", file=sys.stderr)
             return 1
         try:
-            report = convert_v21_to_v30(args.src, args.dst, data_file_size_in_mb=args.size_mb)
+            report = convert_v21_to_v30(
+                args.src, args.dst,
+                data_file_size_in_mb=args.size_mb,
+                drop_videos=args.drop_videos,
+            )
         except Exception as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 1

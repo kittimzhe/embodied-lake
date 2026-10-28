@@ -173,6 +173,7 @@ def convert_v21_to_v30(
     dst: str | Path,
     *,
     data_file_size_in_mb: float = DEFAULT_DATA_FILE_SIZE_IN_MB,
+    drop_videos: bool = False,
 ) -> ConvertReport:
     root = Path(src)
     target = Path(dst)
@@ -181,11 +182,18 @@ def convert_v21_to_v30(
 
     video_keys = [k for k, ft in (info.get("features") or {}).items() if ft.get("dtype") == "video"]
     if video_keys:
-        raise NotImplementedError(
-            "video features are not supported by this converter yet (mp4 concatenation + "
-            f"timestamp ranges pending); found: {video_keys}. "
-            "Use upstream convert_dataset_v21_to_v30.py for video datasets."
-        )
+        if not drop_videos:
+            raise NotImplementedError(
+                "video features are not supported by this converter yet (mp4 concatenation + "
+                f"timestamp ranges pending); found: {video_keys}. "
+                "Use upstream convert_dataset_v21_to_v30.py for video datasets, or pass "
+                "drop_videos=True to convert the tabular data without videos."
+            )
+        info = dict(info)
+        info["features"] = {
+            k: ft for k, ft in (info.get("features") or {}).items() if ft.get("dtype") != "video"
+        }
+        payload["info"] = info
 
     if target.exists():
         shutil.rmtree(target)
@@ -316,6 +324,11 @@ def convert_v21_to_v30(
     for key, ft in (new_info.get("features") or {}).items():
         if ft.get("dtype") != "video":
             ft["fps"] = new_info["fps"]
+    if video_keys and drop_videos:
+        new_info["video_path"] = None
+        report.notes.append(
+            f"video features dropped by explicit request: {video_keys}"
+        )
     (target / "meta" / "info.json").write_text(
         json.dumps(new_info, indent=2, ensure_ascii=False), encoding="utf-8"
     )

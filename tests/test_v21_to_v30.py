@@ -224,3 +224,28 @@ def test_aggregate_stats_weighted() -> None:
     assert agg["f"]["min"] == -1.0 and agg["f"]["max"] == 3.0
     # combined population variance of {-1x4? no: ep0 all-0 x4, ep1 all-2 x6}
     assert agg["f"]["std"] == pytest.approx(0.9797958971)  # sqrt(0.96)
+
+
+def test_convert_drop_videos(v21_dataset: Path, tmp_path: Path):
+    """video features normally fail fast; drop_videos=True converts tabular only."""
+    import shutil as _shutil
+
+    src = tmp_path / "src"
+    _shutil.copytree(v21_dataset, src)
+    info_path = src / "meta" / "info.json"
+    info = json.loads(info_path.read_text())
+    info["features"]["observation.image"] = {"dtype": "video", "shape": [3, 480, 640], "info": {"video_path": "videos/observation.image", "fps": 30, "pixels_paths": None}}
+    info["video_path"] = "videos/{video_key}/episode_{episode_index:06d}.mp4"
+    info["total_videos"] = 2
+    info_path.write_text(json.dumps(info))
+
+    with pytest.raises(NotImplementedError):
+        convert_v21_to_v30(src, tmp_path / "never")
+
+    out = tmp_path / "out"
+    report = convert_v21_to_v30(src, out, drop_videos=True)
+    assert any("dropped" in n for n in report.notes)
+    new_info = json.loads((out / "meta" / "info.json").read_text())
+    assert "observation.image" not in new_info["features"]
+    assert new_info["video_path"] is None
+    assert new_info["video_files_size_in_mb"] is None
