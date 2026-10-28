@@ -64,3 +64,15 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 **Learnings (2026-10-28, round 2)**: hot-repo bug fixes are a red ocean (3 parallel fixes on one bug) — confirmed twice. Pivot contribution strategy to *feature PRs born from project work* (upstream has NO mcap/hdf5/rlds→lerobot converters; official v21→v30 script is single-machine only) where we hold unique context and there is no race. Next: build mcap→lerobot converter, then propose upstream.
 
 **Learnings (2026-10-28)**: LeRobot fresh well-scoped issues get claimed in ~24h → routine must run at high frequency; prefer issues where our Babel/QC work gives unique context (converters, MCAP/HDF5/RLDS ingestion) over generic drive-by fixes; policy check done (AGENTS.md + CONTRIBUTING.md present, AI-assisted contributions anticipated; uv, Python 3.12+, pre-commit ruff/mypy, pytest marks). Awaiting from user: GitHub username + target role before first fork/PR.
+
+### Real-data validation record (2026-10-28, r5)
+- Target: `lerobot/pusht` v2.1 revision (206 episodes / 25,650 frames), real community dataset
+- Tool: `elake convert v21-to-v30 --drop-videos` + `elake qc` (PASS, 0 errors)
+- Compared against the OFFICIAL v3.0 conversion on `main`:
+  tasks ✅ · episodes metadata (all 8 structural columns over 206 rows) ✅ ·
+  50/50 shared stats columns (element-wise, vector features) ✅ ·
+  stats.json aggregate (count-weighted moments match upstream) ✅ ·
+  data rows 25,650 × 10 shared columns value-identical ✅ ·
+  info.json key fields ✅ — only video stats columns differ (dropped by request)
+- Bug found & fixed by this validation: v2.1 per-episode stats are per-dimension
+  LISTS, not scalars — aggregation rewritten element-wise (regression test added)
