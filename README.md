@@ -85,6 +85,7 @@ and HDF5 payloads with 1e-6 precision in the test suite (25 tests).
 | converter | rate | DROID-scale extrapolation (tabular) |
 |---|---|---|
 | v2.1 → v3.0 (pusht, 25,650 rows) | **216,000 rows/s** | ~2 min |
+| v2.1 → v3.0 (synthetic scale: 20k episodes / 4M rows / 174 MB) | **395,000 rows/s** — QC PASS, source-vs-output diff IDENTICAL, shards into 2 data files | ~30 s |
 | MCAP → v3.0 (10,000 frames, incl. CDR decode) | **61,000 rows/s** | ~6 min |
 
 Reference: the LanceDB DROID full conversion (76k trajectories, incl. video +
