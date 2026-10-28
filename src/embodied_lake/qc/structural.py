@@ -164,6 +164,74 @@ def _check_v30_data(root: Path, card: DatasetCard, report: QcReport) -> None:
     if card.features and not (root / "meta" / "stats.json").exists():
         report.issues.append(QcIssue("stats_missing", "warn", "meta/stats.json not found"))
 
+    _check_timestamps(root, card, report)
+
+
+def _check_timestamps(root: Path, card: DatasetCard, report: QcReport) -> None:
+    """Timestamp monotonicity + effective-rate sanity per data file.
+
+    Catches the classic collection bugs community tooling (lerobot-doctor)
+    reports: frozen clocks, dropped frames, fps drift. Median-based so a few
+    outliers don't trip it.
+    """
+    import numpy as np
+
+    data_root = root / "data"
+    files = sorted(data_root.glob("chunk-*/file-*.parquet"))
+    for path in files:
+        tbl = pq.read_table(path, columns=["timestamp", "episode_index", "frame_index"])
+        ts = np.asarray(tbl.column("timestamp").to_pylist(), dtype=np.float64)
+        eps = tbl.column("episode_index").to_pylist()
+        frames = tbl.column("frame_index").to_pylist()
+        name = path.name
+
+        # segment rows by episode: frame_index continuity + timestamp
+        # monotonicity must hold WITHIN an episode — real datasets restart
+        # timestamps at 0 on every episode boundary.
+        start = 0
+        segments: list[tuple[int, int, int]] = []  # (ep, start, end)
+        for i in range(1, len(eps) + 1):
+            if i == len(eps) or eps[i] != eps[start]:
+                segments.append((eps[start], start, i))
+                start = i
+        for ep, a, b in segments:
+            seg_frames = frames[a:b]
+            if seg_frames != list(range(len(seg_frames))):
+                report.issues.append(
+                    QcIssue(
+                        "frame_index_gap",
+                        "error",
+                        f"{name}: episode {ep} frame_index not contiguous "
+                        f"({seg_frames[:5]}...)",
+                    )
+                )
+            seg_ts = ts[a:b]
+            if len(seg_ts) > 1 and np.any(np.diff(seg_ts) < 0):
+                first_bad = int(np.argmax(np.diff(seg_ts) < 0))
+                report.issues.append(
+                    QcIssue(
+                        "timestamp_non_monotonic",
+                        "error",
+                        f"{name}: episode {ep} timestamp decreases at row {a + first_bad + 1}",
+                    )
+                )
+            # effective rate vs declared fps (median spacing), within episode
+            if card.fps and len(seg_ts) > 10:
+                diffs = np.diff(seg_ts)
+                diffs = diffs[diffs > 0]
+                if len(diffs):
+                    median_dt = float(np.median(diffs))
+                    expected = 1.0 / card.fps
+                    if median_dt > 0 and abs(median_dt - expected) / expected > 0.2:
+                        report.issues.append(
+                            QcIssue(
+                                "fps_drift",
+                                "warn",
+                                f"{name}: episode {ep} median dt {median_dt:.4f}s implies "
+                                f"{1.0 / median_dt:.2f} fps, info.json declares {card.fps}",
+                            )
+                        )
+
 
 def _check_tasks(root: Path, card: DatasetCard, report: QcReport) -> None:
     tasks_path = root / "meta" / "tasks.parquet"
