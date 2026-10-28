@@ -32,9 +32,9 @@
   <table>
     <thead><tr>
       <th>dataset</th><th>format</th><th>episodes</th><th>frames</th>
-      <th>fps</th><th>qc</th><th>score</th><th>preview</th>
+      <th>fps</th><th>qc</th><th>score</th><th>pinned</th><th>preview</th>
     </tr></thead>
-    <tbody id="rows"><tr><td colspan="8" class="muted">loading…</td></tr></tbody>
+    <tbody id="rows"><tr><td colspan="9" class="muted">loading…</td></tr></tbody>
   </table>
   <p class="muted" style="font-size:12px">
     episode previews open in the hosted Rerun web viewer; self-hosted viewer
@@ -48,7 +48,7 @@ async function load() {
     const rows = await res.json();
     const tb = document.getElementById('rows');
     if (!rows.length) {
-      tb.innerHTML = '<tr><td colspan="8" class="muted">catalog empty — register a dataset: <code>elake catalog add &lt;dir&gt;</code> or POST /api/datasets</td></tr>';
+      tb.innerHTML = '<tr><td colspan="9" class="muted">catalog empty — register a dataset: <code>elake catalog add &lt;dir&gt;</code> or POST /api/datasets</td></tr>';
       return;
     }
     tb.innerHTML = rows.map(r => `
@@ -60,6 +60,7 @@ async function load() {
         <td>${r.fps ?? '–'}</td>
         <td class="${r.qc_ok ? 'pass' : 'fail'}">${r.qc_ok === null ? '–' : (r.qc_ok ? 'PASS' : 'FAIL')}</td>
         <td class="score">${r.mean_score === null ? '–' : r.mean_score.toFixed(1)}</td>
+        <td>${r.snapshot ? '<span class="pill" title="' + esc(r.snapshot.hash) + '">' + esc(r.snapshot.hash.slice(0, 8)) + '…</span>' : '<span class="muted">–</span>'}</td>
         <td><a href="https://rerun.io/viewer?url=${encodeURIComponent(location.origin + '/preview/' + encodeURIComponent(r.name) + '.rrd')}" target="_blank" rel="noopener">open ↗</a></td>
       </tr>`).join('');
   } catch (e) {

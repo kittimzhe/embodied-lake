@@ -32,6 +32,36 @@ def make_handler(catalog_dir: str | Path) -> type[BaseHTTPRequestHandler]:
         def log_message(self, fmt: str, *args: Any) -> None:  # noqa: N802
             pass  # quiet by default; CLI prints startup line
 
+        def _snapshots_for(self, dataset_path: str) -> list[dict]:
+            """Snapshot rows for a dataset, read from the snapshot ledger."""
+            import sqlite3
+
+            db = catalog_path / "catalog.db"
+            if not db.is_file():
+                return []
+            try:
+                conn = sqlite3.connect(db)
+                conn.row_factory = sqlite3.Row
+                try:
+                    rows = conn.execute(
+                        "SELECT id, content_hash, message, created_at FROM snapshots"
+                        " WHERE dataset_path = ? ORDER BY id",
+                        (dataset_path,),
+                    ).fetchall()
+                finally:
+                    conn.close()
+            except sqlite3.OperationalError:  # snapshots table not created yet
+                return []
+            return [
+                {
+                    "id": r["id"],
+                    "hash": r["content_hash"],
+                    "message": r["message"],
+                    "created_at": r["created_at"],
+                }
+                for r in rows
+            ]
+
         # ------------------------------------------------------------ #
         def _json(self, code: int, payload: Any) -> None:
             body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -56,26 +86,35 @@ def make_handler(catalog_dir: str | Path) -> type[BaseHTTPRequestHandler]:
             if self.path == "/api/datasets":
                 cat = Catalog(catalog_path)
                 try:
-                    rows = [
-                        {
-                            "id": e.id,
-                            "name": e.name,
-                            "path": e.path,
-                            "version": e.version,
-                            "episodes": e.episodes,
-                            "frames": e.frames,
-                            "fps": e.fps,
-                            "qc_ok": e.qc_ok,
-                            "mean_score": e.mean_score,
-                        }
-                        for e in cat.list()
-                    ]
+                    entries = []
+                    for e in cat.list():
+                        snaps = self._snapshots_for(e.path)
+                        entries.append(
+                            {
+                                "id": e.id,
+                                "name": e.name,
+                                "path": e.path,
+                                "version": e.version,
+                                "episodes": e.episodes,
+                                "frames": e.frames,
+                                "fps": e.fps,
+                                "qc_ok": e.qc_ok,
+                                "mean_score": e.mean_score,
+                                "snapshot": (
+                                    {"id": snaps[-1]["id"], "hash": snaps[-1]["hash"]}
+                                    if snaps
+                                    else None
+                                ),
+                                "snapshot_count": len(snaps),
+                            }
+                        )
+                    rows = entries
                 finally:
                     cat.close()
                 return self._json(200, rows)
 
             m = re.fullmatch(r"/api/datasets/(\d+)", self.path)
-            if m:
+            if m and not self.path.endswith("/snapshots"):
                 cat = Catalog(catalog_path)
                 try:
                     cur = cat.db.execute(
@@ -86,6 +125,20 @@ def make_handler(catalog_dir: str | Path) -> type[BaseHTTPRequestHandler]:
                     cat.close()
                 if row is None:
                     return self._json(404, {"error": "not found"})
+                snaps = self._snapshots_for(row["path"])
+                if snaps:
+                    latest = snaps[-1]
+                    payload_extra = {
+                        "snapshot": {
+                            "id": latest["id"],
+                            "hash": latest["content_hash"],
+                            "message": latest["message"],
+                            "created_at": latest["created_at"],
+                        },
+                        "snapshot_count": len(snaps),
+                    }
+                else:
+                    payload_extra = {"snapshot": None, "snapshot_count": 0}
                 return self._json(
                     200,
                     {
@@ -103,8 +156,23 @@ def make_handler(catalog_dir: str | Path) -> type[BaseHTTPRequestHandler]:
                         "mean_score": row["mean_score"],
                         "source": row["source"],
                         "lineage": json.loads(row["lineage"] or "{}"),
+                        **payload_extra,
                     },
                 )
+
+            m = re.fullmatch(r"/api/datasets/(\d+)/snapshots", self.path)
+            if m:
+                cat = Catalog(catalog_path)
+                try:
+                    cur = cat.db.execute(
+                        "SELECT * FROM datasets WHERE id = ?", (int(m.group(1)),)
+                    )
+                    row = cur.fetchone()
+                finally:
+                    cat.close()
+                if row is None:
+                    return self._json(404, {"error": "not found"})
+                return self._json(200, {"snapshots": self._snapshots_for(row["path"])})
 
             m = re.fullmatch(r"/preview/([\w.\-]+\.rrd)", self.path)
             if m:

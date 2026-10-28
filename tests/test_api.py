@@ -90,3 +90,33 @@ def test_index_served(api: str) -> None:
         body = r.read().decode()
     assert r.status == 200
     assert "embodied-lake" in body and "/api/datasets" in body
+
+
+def test_snapshot_fields_and_history(tmp_path: Path) -> None:
+    _write_mcap(tmp_path / "rec.mcap", 10, 0, action=False)
+    ds = tmp_path / "ds"
+    convert_mcap_to_v30([tmp_path / "rec.mcap"], ds, McapMapping(state_topic=STATE_TOPIC))
+    from embodied_lake.platform.catalog import Catalog
+    from embodied_lake.platform.snapshots import SnapshotStore
+
+    cat = Catalog(tmp_path / "cat")
+    cat.register(ds, source="rec.mcap")
+    cat.close()
+    store = SnapshotStore.open(tmp_path / "cat" / "catalog.db")
+    store.create(ds, message="test pin")
+    store._conn.close()
+
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(tmp_path / "cat"))
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    base = f"http://127.0.0.1:{httpd.server_port}"
+    try:
+        with urllib.request.urlopen(f"{base}/api/datasets", timeout=5) as r:
+            rows = json.loads(r.read())
+        assert rows and rows[0]["snapshot"]["hash"], rows[0]
+        assert rows[0]["snapshot_count"] >= 1
+
+        with urllib.request.urlopen(f"{base}/api/datasets/{rows[0]['id']}/snapshots", timeout=5) as r:
+            snaps = json.loads(r.read())["snapshots"]
+        assert any(s["message"] == "test pin" for s in snaps)
+    finally:
+        httpd.shutdown()
