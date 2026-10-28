@@ -40,8 +40,22 @@ elake convert hdf5-to-v30 episode_*.hdf5 ./ds         # ALOHA-style HDF5
 elake ingest rec_*.mcap ./ds --mode mcap-to-v30 --state-topic /arm/joint_states
 #            ^ convert -> structural qc gate -> score -> register (one command)
 elake catalog list                            # registry with qc verdicts + lineage
-elake serve --port 8317                        # HTTP API over the catalog
+elake serve --port 8317                        # HTTP API + web catalog UI over the registry
 # docker/docker-compose.yml                    # one-command on-prem deployment
+```
+
+### Self-hosted platform surface
+
+`elake serve` (stdlib only, no server framework) exposes:
+
+| route | what |
+|---|---|
+| `/` | web catalog: dataset table (format, episodes, frames, fps, QC verdict, score) with one-click episode preview |
+| `/api/datasets` | JSON list / detail incl. lineage and QC results |
+| `/api/datasets` (POST) | register a dataset from CI or scripts |
+| `/preview/*.rrd` | rendered Rerun episodes — opened in the hosted Rerun web viewer |
+
+`ingest` wires the whole pipeline: convert → QC gate → score → register.
 
 # --- qc + scoring ------------------------------------------------------------
 elake qc ./ds_v30                          # structural PASS/FAIL, exit code 1 on error
