@@ -240,9 +240,23 @@ def main(argv: list[str] | None = None) -> int:
                 args.dst, source=lineage.get("source"), lineage=lineage,
                 with_scoring=not args.no_score,
             )
+            # 5) pin what passed QC: content-addressed snapshot
+            from .platform.snapshots import SnapshotStore
+
+            store = SnapshotStore.open(Path(args.catalog or ".elake") / "catalog.db")
+            try:
+                snap = store.create(
+                    args.dst,
+                    message=f"ingest: {args.mode} (qc PASS"
+                    + (f", score {entry.mean_score:.1f}" if entry.mean_score is not None else "")
+                    + ")",
+                )
+            finally:
+                store._conn.close()
         finally:
             cat.close()
         print(f"registered #{entry.id}: {entry.name} qc=PASS score={entry.mean_score}")
+        print(f"snapshot #{snap.id}: {snap.content_hash[:16]}… ({len(snap.manifest)} files)")
         return 0
 
     if args.command == "snapshot":
