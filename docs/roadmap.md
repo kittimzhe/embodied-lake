@@ -225,3 +225,11 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - 泛化演练 task 705(未见过的任务):quaternion_nonunit 命中 dex[3:7]
   (786/786,median 1.1148,CV 0.001)+ 夹爪双通道全冻结 → 四元数问题
   跨任务/跨通道,已追加评论至 #164(经用户批准),附脚本链接
+
+### r40(末轮):终态盘点
+- 项目:62 commits · 4,747 行 · 51/51 · 四连发版 · CI 绿 · 4 真实语料验证
+- 上游:1 PR 全绿在飞(OpenRAL#451,mergeable,等人工 review 自 r13)+
+  5 条深度评论跨 4 仓库(AgiBot×2 / Rerun / LeRobot×3)
+- 合并 PR 计数:0/3 — 唯一未达项,取决于外部维护者动作(时窗:天-周级),
+  本会话内无法自主推进;全部材料就绪,回应即转 PR
+- 交接:embodied-lake-交接终稿.md(五节,含终版清单)+ 证据链底稿(A-I 节)
