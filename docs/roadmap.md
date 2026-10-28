@@ -199,3 +199,11 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
   channel in a single rrd; POC verified 21KB with rerun 0.40 send_columns) —
   offered examples/ recipe as follow-up contribution
 - r29 scan: LeRobot quiet; Rerun #12984 was the only adjacent item
+
+### r33: AgiBot-World #164 — 国内项目切入 + 新 QC 规则
+- downloaded task 676 tabular via streaming tar extract (parquet+meta at tarball
+  head; no videos needed) — reusable validation recipe
+- new `quaternion_nonunit` rule: reproduces the issue's numbers digit-for-digit
+  (ee_base 663/751 @ 1.0070, ee_camera 737/751 @ 1.2481), extends to action.*
+  counterparts + frozen channels; calibrated zero-FP on 3 real corpora; 50/50
+- independent-verification comment posted (user-approved) — 国内项目 foothold
