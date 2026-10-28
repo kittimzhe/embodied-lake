@@ -212,3 +212,8 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - workspace-level embodied-lake-交接终稿.md:项目状态(4 语料×3 发版)、
   四线贡献管线的精确跟进动作(每条含 URL+一键操作)、证据链压缩版(3 条
   最强主张+硬证据)、目标后节奏建议
+
+### r37: 收官一致性检查
+- 交接终稿 + 证据链底稿升级到 v0.1.3(容器演练故事入 I 节)
+- README 终检修三处:release 徽章 v0.1.3 / 状态行 Phase 2 complete /
+  AgiBotWorld 语料 + quaternion_nonunit 规则(此前漏宣的第 4 语料)
