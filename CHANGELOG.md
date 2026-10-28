@@ -6,6 +6,25 @@ adherence to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starts a
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-10-28
+
+### Added
+- **`quaternion_nonunit` scoring rule** — flags pose-like features (xyz+quat
+  layout, dims [3:7]) whose quaternion norms deviate from 1. Calibrated against
+  real data: reproduces the AgiBotWorld-Beta findings
+  (OpenDriveLab/AgiBot-World#164) digit-for-digit — ee_base 663/751 frames @
+  norm median 1.0070, ee_camera 737/751 @ 1.2481 — and extends them to the
+  `action.*` counterparts. Joint-angle groups stay silent (norm-wandering
+  discriminator CV < 0.2; real aloha qpos measures 0.59/0.55 and does not
+  trigger). Zero false positives across the three validation corpora.
+- **`elake report`** — shareable Markdown dataset report (identity + structural
+  QC verdict + per-episode score table with findings), for PRs/dataset
+  cards/onboarding.
+- Streaming validation recipe: task-level tarballs on the Hub (AgiBotWorld
+  style) can be validated tabular-only — parquet+meta sit at the tarball head.
+
+## [0.1.1] — 2026-10-28
+
 ## [0.1.1] — 2026-10-28
 
 ### Added

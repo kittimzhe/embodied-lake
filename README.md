@@ -72,7 +72,7 @@ elake diff ./ds_v21 ./ds_v30 --expect-migration   # conversion validation: value
                                            # (the check used against official pusht v3.0)
 elake snapshot create ./ds_v30 -m "post-QC baseline"   # content-addressed pin
 elake snapshot verify ./ds_v30                    # drift detection (exit 1 on change)
-elake score ./ds_v30 --min-score 80        # content rules: frozen joints, saturation,
+elake score ./ds_v30 --min-score 80        # content rules: frozen joints, saturation, non-unit quaternions,
                                            # action spikes, low-motion episodes
 ```
 
