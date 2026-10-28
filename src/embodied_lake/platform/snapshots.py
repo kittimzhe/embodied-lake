@@ -102,6 +102,8 @@ class SnapshotStore:
     @classmethod
     def open(cls, root: str | Path) -> "SnapshotStore":
         path = Path(root)
+        if path.is_dir():
+            path = path / "catalog.db"  # serve-style catalog root (ELAKE_CATALOG)
         path.parent.mkdir(parents=True, exist_ok=True)
         return cls(sqlite3.connect(path))
 

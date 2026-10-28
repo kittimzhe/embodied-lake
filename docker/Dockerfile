@@ -6,6 +6,7 @@ RUN pip install --no-cache-dir pyarrow pandas numpy mcap mcap-ros2-support h5py 
 
 WORKDIR /app
 COPY . /app
+RUN pip install --no-cache-dir --no-deps .
 ENV PYTHONPATH=/app/src
 
 # datasets + catalog live on mounted volumes

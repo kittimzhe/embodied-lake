@@ -78,18 +78,18 @@ def build_parser() -> argparse.ArgumentParser:
     ps_c = ps.add_parser("create", help="record a content-addressed snapshot")
     ps_c.add_argument("dataset")
     ps_c.add_argument("-m", "--message", default="")
-    ps_c.add_argument("--catalog", default="state/catalog.db", help="snapshot DB path")
+    ps_c.add_argument("--catalog", default=None, help="snapshot DB path")
     ps_l = ps.add_parser("list", help="snapshot history for a dataset")
     ps_l.add_argument("dataset", nargs="?", default=None)
-    ps_l.add_argument("--catalog", default="state/catalog.db", help="snapshot DB path")
+    ps_l.add_argument("--catalog", default=None, help="snapshot DB path")
     ps_v = ps.add_parser("verify", help="current tree vs latest snapshot")
     ps_v.add_argument("dataset")
-    ps_v.add_argument("--catalog", default="state/catalog.db", help="snapshot DB path")
+    ps_v.add_argument("--catalog", default=None, help="snapshot DB path")
     ps_d = ps.add_parser("diff", help="changeset between two pins (default prev→latest)")
     ps_d.add_argument("dataset")
     ps_d.add_argument("--from", dest="from_id", type=int, default=None)
     ps_d.add_argument("--to", dest="to_id", type=int, default=None)
-    ps_d.add_argument("--catalog", default="state/catalog.db", help="snapshot DB path")
+    ps_d.add_argument("--catalog", default=None, help="snapshot DB path")
 
     p_rep = sub.add_parser("report", help="shareable Markdown dataset report")
     p_rep.add_argument("dataset")
@@ -274,7 +274,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "snapshot":
+        import os
+
         from .platform.snapshots import SnapshotStore
+
+        args.catalog = args.catalog or os.environ.get("ELAKE_CATALOG", "state/catalog.db")
 
         store = SnapshotStore.open(args.catalog)
         if args.snap_command == "create":

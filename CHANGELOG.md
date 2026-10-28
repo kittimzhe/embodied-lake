@@ -6,6 +6,21 @@ adherence to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starts a
 
 ## [Unreleased]
 
+## [0.1.3] — 2026-10-28
+
+### Fixed (all caught by a container e2e re-drill)
+- `GET /api/datasets/{id}` and `/{id}/snapshots` now accept the dataset **name**
+  as well as the numeric id (README examples query by name; routing disagreed).
+- `elake snapshot --catalog` accepts both a db-file path and a serve-style
+  catalog **directory**, and honors `ELAKE_CATALOG` (the container sets it);
+  previously the CLI silently used a different database than `serve`.
+- Docker image now installs the package (`elake` console script available in
+  `docker compose exec`; previously only `python -m embodied_lake` worked).
+- Verified in-container: register → detail by name (206 eps, qc_ok) →
+  `elake snapshot create` → `GET .../snapshots` returns the pin (hash, message).
+
+## [0.1.2] — 2026-10-28
+
 ## [0.1.2] — 2026-10-28
 
 ### Added

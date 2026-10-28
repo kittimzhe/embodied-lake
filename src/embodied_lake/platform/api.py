@@ -113,12 +113,14 @@ def make_handler(catalog_dir: str | Path) -> type[BaseHTTPRequestHandler]:
                     cat.close()
                 return self._json(200, rows)
 
-            m = re.fullmatch(r"/api/datasets/(\d+)", self.path)
-            if m and not self.path.endswith("/snapshots"):
+            m = re.fullmatch(r"/api/datasets/([\w.-]+?)(/snapshots)?", self.path)
+            if m and not m.group(2):
                 cat = Catalog(catalog_path)
                 try:
+                    key = m.group(1)
                     cur = cat.db.execute(
-                        "SELECT * FROM datasets WHERE id = ?", (int(m.group(1)),)
+                        "SELECT * FROM datasets WHERE id = ? OR name = ?",
+                        (key if key.isdigit() else -1, key),
                     )
                     row = cur.fetchone()
                 finally:
@@ -160,12 +162,14 @@ def make_handler(catalog_dir: str | Path) -> type[BaseHTTPRequestHandler]:
                     },
                 )
 
-            m = re.fullmatch(r"/api/datasets/(\d+)/snapshots", self.path)
+            m = re.fullmatch(r"/api/datasets/([\w.-]+?)/snapshots", self.path)
             if m:
                 cat = Catalog(catalog_path)
                 try:
+                    key = m.group(1)
                     cur = cat.db.execute(
-                        "SELECT * FROM datasets WHERE id = ?", (int(m.group(1)),)
+                        "SELECT * FROM datasets WHERE id = ? OR name = ?",
+                        (key if key.isdigit() else -1, key),
                     )
                     row = cur.fetchone()
                 finally:
