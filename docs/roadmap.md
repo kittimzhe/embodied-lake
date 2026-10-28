@@ -155,3 +155,12 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - LeRobot #4443 Draft B posted (converter-table data point, public link now live)
 - packaging: extras aligned with reality (babel/viz/all), fresh-venv editable
   install + elake smoke verified without PYTHONPATH
+
+### r22-23: snapshot ledger + PR 451 second review round
+- feat: platform/snapshots.py + `elake snapshot create/list/verify` — content-
+  addressed pin (per-file sha256 incl. meta), drift names exact files, exit 1
+  for CI; real drill on pusht (tamper→'changed: meta/info.json'→restore→OK);
+  45/45 tests; wheel install re-verified
+- PR 451: merge-commit CI ALL PASS incl. CodeRabbit re-review; new Major
+  finding (no publish_fn on build_hal path) → loud connect() warning (repo
+  fail-loudly philosophy), scope rationale posted, thread resolved
