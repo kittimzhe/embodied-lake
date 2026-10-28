@@ -53,7 +53,18 @@ The v2.1→v3.0 converter's output was compared, artifact by artifact, with the
 - only divergence: video stats columns (dropped by explicit `--drop-videos`)
 
 The MCAP and ALOHA converters round-trip real `sensor_msgs/JointState` (CDR)
-and HDF5 payloads with 1e-6 precision in the test suite (23 tests).
+and HDF5 payloads with 1e-6 precision in the test suite (25 tests).
+
+## Throughput (real data, Apple silicon, best of 3)
+
+| converter | rate | DROID-scale extrapolation (tabular) |
+|---|---|---|
+| v2.1 → v3.0 (pusht, 25,650 rows) | **216,000 rows/s** | ~2 min |
+| MCAP → v3.0 (10,000 frames, incl. CDR decode) | **61,000 rows/s** | ~6 min |
+
+Reference: the LanceDB DROID full conversion (76k trajectories, incl. video +
+vector pipelines) runs 34 min — embodied-lake's tabular path is not the
+bottleneck; video handling is the open work (see roadmap).
 
 ## Design notes
 

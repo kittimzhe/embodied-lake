@@ -46,6 +46,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="convert tabular data only; drop video features instead of failing",
     )
 
+    p_prev = sub.add_parser("preview", help="render a dataset to a Rerun .rrd (headless)")
+    p_prev.add_argument("src", help="local dataset directory (v3.0)")
+    p_prev.add_argument("--out", default=None, help="output .rrd path (default: <dataset>.rrd)")
+    p_prev.add_argument("--episodes", nargs="*", type=int, default=None, help="episode indices (default: all)")
+
     p_qc = sub.add_parser("qc", help="structural quality checks on a local dataset")
     p_qc.add_argument("src", help="dataset directory")
 
@@ -101,6 +106,18 @@ def main(argv: list[str] | None = None) -> int:
             )
         else:
             print(render(card))
+        return 0
+
+    if args.command == "preview":
+        try:
+            import rerun  # noqa: F401
+        except ImportError:
+            print("error: rerun-sdk required for preview (pip install rerun-sdk)", file=sys.stderr)
+            return 1
+        from .viz.rrd import render_dataset
+
+        out = render_dataset(args.src, args.out, args.episodes)
+        print(f"preview written: {out}")
         return 0
 
     if args.command == "qc":

@@ -76,3 +76,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
   info.json key fields ✅ — only video stats columns differ (dropped by request)
 - Bug found & fixed by this validation: v2.1 per-episode stats are per-dimension
   LISTS, not scalars — aggregation rewritten element-wise (regression test added)
+
+### Benchmark record (2026-10-28, r8; scripts/benchmark.py, best of 3)
+- v2.1→v3.0 on real lerobot/pusht (25,650 rows, videos dropped): 0.12 s →
+  **216,233 rows/s**; DROID tabular extrapolation ~2 min
+- mcap→v3.0 synthetic 10k JointState frames (CDR decode dominates): 0.16 s →
+  **61,369 rows/s**; extrapolation ~6 min
+- Public reference: LanceDB full DROID conversion 34 min (video+vector incl.)
