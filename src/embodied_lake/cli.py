@@ -51,6 +51,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_mcap.add_argument("--fps", type=int, default=30)
     p_mcap.add_argument("--robot-type", default=None)
 
+    p_aloha = csub.add_parser("hdf5-to-v30", help="ALOHA-style HDF5 -> LeRobot v3.0")
+    p_aloha.add_argument("src", nargs="+", help="one or more .hdf5 episode files")
+    p_aloha.add_argument("dst", help="destination dataset directory (v3.0)")
+    p_aloha.add_argument("--task", default="manipulation demo")
+    p_aloha.add_argument("--fps", type=int, default=50, help="ALOHA default recording rate")
+    p_aloha.add_argument("--include-qvel", action="store_true", help="also emit observation.velocity")
+    p_aloha.add_argument("--prefix", default="", help="dataset path prefix for variants (e.g. data/obs)")
+
     return parser
 
 
@@ -132,6 +140,34 @@ def main(argv: list[str] | None = None) -> int:
         )
         for t in report.skipped_topics:
             print(f"skipped undecodable topic: {t}")
+        for note in report.notes:
+            print(f"note: {note}")
+        return 0
+
+    if args.command == "convert" and args.converter == "hdf5-to-v30":
+        try:
+            from .babel.aloha_to_lerobot import AlohaMapping, convert_aloha_to_v30
+        except ImportError as exc:
+            print(f"error: missing optional dependency for conversion: {exc}", file=sys.stderr)
+            return 1
+        try:
+            report = convert_aloha_to_v30(
+                args.src,
+                args.dst,
+                AlohaMapping(
+                    prefix=args.prefix,
+                    include_qvel=args.include_qvel,
+                    task=args.task,
+                    fps=args.fps,
+                ),
+            )
+        except Exception as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(
+            f"converted {len(report.files)} file(s): {report.episodes} episodes / "
+            f"{report.frames} frames"
+        )
         for note in report.notes:
             print(f"note: {note}")
         return 0
