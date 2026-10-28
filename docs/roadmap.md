@@ -11,7 +11,7 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - Deliverable: reproducible env doc + "LeRobot v2.1 vs v3.0 in practice" note
 
 ## Phase 1 — Babel layer + QC MVP (months 1-2)
-- [ ] `elake convert mcap→lerobot-v3`
+- [ ] `elake convert mcap→lerobot-v3` (next; mcap 1.6 installed in venv) — upstream-feature-PR seed
 - [ ] `elake convert hdf5(aloha)→lerobot-v3`
 - [ ] `elake convert v2.1→v3.0` (incremental)
 - [ ] `elake convert rlds→lerobot-v3`
@@ -45,5 +45,9 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 | 2026-10-28 | rerun-io/rerun | #11269 (vcpkg docs) | excluded | maintainer marked blocked on upstream vcpkg package |
 | 2026-10-28 | huggingface/lerobot | #5116 (FastWAM docs) | excluded | commenter already wrote fix, PR imminent |
 | 2026-10-28 | huggingface/lerobot | #5105 (pi0 pad-in-loss bug) | excluded | PRs #5106/#5108 already open (claimed within 1 day of filing) |
+| 2026-10-28 (r2) | huggingface/lerobot | #5118 (camera-slot bug) | excluded | 3 fixes in flight (fork branch + PR #5120 + PR #5129 covering 6 policies) |
+| 2026-10-28 (r2) | foxglove/mcap | #1907 (rust fuzz targets) | excluded | issue author already opened PR #1908; maintainer undecided on fuzzing |
+
+**Learnings (2026-10-28, round 2)**: hot-repo bug fixes are a red ocean (3 parallel fixes on one bug) — confirmed twice. Pivot contribution strategy to *feature PRs born from project work* (upstream has NO mcap/hdf5/rlds→lerobot converters; official v21→v30 script is single-machine only) where we hold unique context and there is no race. Next: build mcap→lerobot converter, then propose upstream.
 
 **Learnings (2026-10-28)**: LeRobot fresh well-scoped issues get claimed in ~24h → routine must run at high frequency; prefer issues where our Babel/QC work gives unique context (converters, MCAP/HDF5/RLDS ingestion) over generic drive-by fixes; policy check done (AGENTS.md + CONTRIBUTING.md present, AI-assisted contributions anticipated; uv, Python 3.12+, pre-commit ruff/mypy, pytest marks). Awaiting from user: GitHub username + target role before first fork/PR.
