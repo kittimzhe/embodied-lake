@@ -135,3 +135,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - r16: CodeRabbit 3 Major findings (all valid) — single-namespace collision,
   robot.yaml keys not wired to build_hal, docstring drift → all fixed in 3b9672f,
   28/28 tests (+1 new namespace-validation test), reply posted
+
+### r17: elake diff + PR 451 lint loop
+- new: qc/diff.py + `elake diff [--expect-migration]` — automates r5's manual
+  artifact comparison; real proof: pusht v2.1 vs our v3.0 → IDENTICAL
+  (25,650×10, stats aggregate consistent source-vs-output); 40/40 tests
+- PR #451: ruff PLR2004 (magic 2) → constant; one bad intermediate push
+  (continuation-indent syntax) fixed in 05cd2b9; ruff clean + 28/28 local
