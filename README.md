@@ -1,7 +1,7 @@
 # embodied-lake (working title)
 
 [![CI](https://github.com/kittimzhe/embodied-lake/actions/workflows/ci.yml/badge.svg)](https://github.com/kittimzhe/embodied-lake/actions/workflows/ci.yml)
-[![release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/kittimzhe/embodied-lake/releases/tag/v0.1.0)
+[![release](https://img.shields.io/badge/release-v0.1.1-blue)](https://github.com/kittimzhe/embodied-lake/releases/tag/v0.1.1)
 [![license](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
 > LeRobot-native, self-hostable data platform for embodied AI — an open alternative to the (closed-source) Foxglove Data Platform, built on the [LeRobot dataset format](https://huggingface.co/docs/lerobot/lerobot-dataset-v3) (the de-facto standard: 5,750+ datasets on the Hugging Face Hub) and [Rerun](https://github.com/rerun-io/rerun) as the multimodal data layer.
