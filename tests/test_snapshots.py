@@ -65,3 +65,23 @@ def test_meta_change_detected(tmp_path: Path) -> None:
     info.write_text(json.dumps({"total_episodes": 2}))
     ok, _, drift = store.verify(ds)
     assert not ok
+
+
+def test_changeset_between_pins(tmp_path: Path) -> None:
+    ds = tmp_path / "ds"
+    _mini_ds(ds)
+    store = SnapshotStore.open(tmp_path / "cat.db")
+    store.create(ds, message="v1")
+    # legitimate rewrite: more rows
+    pq.write_table(pa.table({"a": [1, 2, 3, 4]}), ds / "data" / "chunk-000" / "file-000.parquet")
+    (ds / "data" / "chunk-000" / "file-001.parquet").unlink(missing_ok=True)
+    store.create(ds, message="v2 more rows")
+    rows = store.changeset(ds)
+    assert rows, "expected changes between pins"
+    kinds = {r["file"]: r["change"] for r in rows}
+    assert kinds.get("data/chunk-000/file-000.parquet") == "changed"
+    detail = next(r for r in rows if r["file"].endswith("file-000.parquet"))
+    assert "rows" in detail["detail"]
+    # manifest-only comparison works even after tree deletion
+    shutil.rmtree(ds)
+    assert store.changeset(ds) == rows

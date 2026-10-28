@@ -130,6 +130,36 @@ class SnapshotStore:
             for row in self._conn.execute(q, args).fetchall()
         ]
 
+    def changeset(self, dataset_dir: str | Path, from_id: int | None = None,
+                  to_id: int | None = None) -> list[dict]:
+        """File-level changes between two pins (default: previous vs latest).
+
+        Returns rows: {file, change: added|removed|changed|renamed?, detail}.
+        Content-only comparison via the stored manifests — no dataset access
+        needed, so pins can be compared long after the tree is gone.
+        """
+        snaps = self.list(dataset_dir)
+        if len(snaps) < 2:
+            raise ValueError("need at least two snapshots to diff")
+        a = next((s for s in snaps if s.id == from_id), snaps[-2]) if from_id else snaps[-2]
+        b = next((s for s in snaps if s.id == to_id), snaps[-1]) if to_id else snaps[-1]
+        old = {r["path"]: r for r in a.manifest}
+        new = {r["path"]: r for r in b.manifest}
+        out: list[dict] = []
+        for path in sorted(set(old) - set(new)):
+            out.append({"file": path, "change": "removed"})
+        for path in sorted(set(new) - set(old)):
+            out.append({"file": path, "change": "added",
+                        "detail": f"{new[path].get('rows', '?')} rows"})
+        for path in sorted(set(old) & set(new)):
+            if old[path] != new[path]:
+                d = []
+                for k in ("bytes", "rows", "sha256"):
+                    if old[path].get(k) != new[path].get(k):
+                        d.append(f"{k}: {old[path].get(k)} → {new[path].get(k)}")
+                out.append({"file": path, "change": "changed", "detail": "; ".join(d)})
+        return out
+
     def verify(self, dataset_dir: str | Path) -> tuple[bool, str, list[str]]:
         """Current tree vs latest snapshot → (ok, expected_hash, drift_details)."""
         snaps = self.list(dataset_dir)

@@ -85,6 +85,11 @@ def build_parser() -> argparse.ArgumentParser:
     ps_v = ps.add_parser("verify", help="current tree vs latest snapshot")
     ps_v.add_argument("dataset")
     ps_v.add_argument("--catalog", default="state/catalog.db", help="snapshot DB path")
+    ps_d = ps.add_parser("diff", help="changeset between two pins (default prev→latest)")
+    ps_d.add_argument("dataset")
+    ps_d.add_argument("--from", dest="from_id", type=int, default=None)
+    ps_d.add_argument("--to", dest="to_id", type=int, default=None)
+    ps_d.add_argument("--catalog", default="state/catalog.db", help="snapshot DB path")
 
     p_diff = sub.add_parser("diff", help="compare two datasets (conversion validation)")
     p_diff.add_argument("left", help="dataset A (e.g. v2.1 source)")
@@ -272,6 +277,17 @@ def main(argv: list[str] | None = None) -> int:
 
                 ts = datetime.datetime.fromtimestamp(s.created_at).strftime("%Y-%m-%d %H:%M")
                 print(f"#{s.id:<3} {ts}  {s.content_hash[:16]}…  {s.message or '(no message)'}")
+        elif args.snap_command == "diff":
+            try:
+                rows = store.changeset(args.dataset, args.from_id, args.to_id)
+            except ValueError as e:
+                print(f"error: {e}")
+                return 1
+            if not rows:
+                print("no file-level changes between pins")
+            for r in rows:
+                print(f"  {r['change']:<8} {r['file']}" + (f"  ({r['detail']})" if r.get("detail") else ""))
+            return 0
         elif args.snap_command == "verify":
             ok, expected, drift = store.verify(args.dataset)
             if ok:
