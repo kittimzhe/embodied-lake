@@ -15,7 +15,8 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
       on HF — pandas-index tasks, quantile stats pass-through, meta/episodes const cols)
 - [x] `elake convert mcap→lerobot-v3` (2026-10-28 r3: JointState/CDR + JSON channels,
       forward-fill action alignment, real stats incl. quantiles; dogfooded via `elake inspect`)
-- [ ] `elake convert hdf5(aloha)→lerobot-v3`
+- [x] `elake convert hdf5(aloha)→lerobot-v3` (2026-10-28 r4: qpos/action/qvel,
+      prefix variants, images skipped with note; 17/17 tests)
 - [ ] `elake convert rlds→lerobot-v3`
 - [ ] Benchmark: DROID 76k trajectories end-to-end (reference: LanceDB full conversion 34 min)
 - [ ] `elake qc score` (Flora-Rewarder orchestration) + quality report
@@ -41,6 +42,8 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 | 2026-10-28 | git repo initialized, first commit | `8acd588` |
 | 2026-10-28 | v2.1→v3.0 converter, 10/10 tests, real-dataset validated | commit `74c1dbc` |
 | 2026-10-28 | mcap→v3.0 converter, 14/14 tests, CLI end-to-end + inspector dogfood | commit `6086eb8` |
+| 2026-10-28 | hdf5(aloha)→v3.0 converter, 17/17 tests | commit `1828376` |
+| 2026-10-28 (r4) | upstream engagement kit drafted (RFC #4368 comment, PR #4443 converter-table proposal, examples-issue draft) | ../upstream-engagement-kit.md; gh CLI found authenticated as `kittimzhe` — awaiting user confirmation |
 
 ## Contribution log (/contributor routine)
 | Date | Repo | Candidate | Status | Reason |
