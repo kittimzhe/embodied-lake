@@ -73,6 +73,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_ing.add_argument("--no-score", action="store_true")
     p_ing.add_argument("--catalog", default=None, help="catalog dir (default: .elake)")
 
+    p_snap = sub.add_parser("snapshot", help="dataset snapshots (integrity ledger)")
+    ps = p_snap.add_subparsers(dest="snap_command", required=True)
+    ps_c = ps.add_parser("create", help="record a content-addressed snapshot")
+    ps_c.add_argument("dataset")
+    ps_c.add_argument("-m", "--message", default="")
+    ps_c.add_argument("--catalog", default="state/catalog.db", help="snapshot DB path")
+    ps_l = ps.add_parser("list", help="snapshot history for a dataset")
+    ps_l.add_argument("dataset", nargs="?", default=None)
+    ps_l.add_argument("--catalog", default="state/catalog.db", help="snapshot DB path")
+    ps_v = ps.add_parser("verify", help="current tree vs latest snapshot")
+    ps_v.add_argument("dataset")
+    ps_v.add_argument("--catalog", default="state/catalog.db", help="snapshot DB path")
+
     p_diff = sub.add_parser("diff", help="compare two datasets (conversion validation)")
     p_diff.add_argument("left", help="dataset A (e.g. v2.1 source)")
     p_diff.add_argument("right", help="dataset B (e.g. converted v3.0)")
@@ -230,6 +243,30 @@ def main(argv: list[str] | None = None) -> int:
         finally:
             cat.close()
         print(f"registered #{entry.id}: {entry.name} qc=PASS score={entry.mean_score}")
+        return 0
+
+    if args.command == "snapshot":
+        from .platform.snapshots import SnapshotStore
+
+        store = SnapshotStore.open(args.catalog)
+        if args.snap_command == "create":
+            s = store.create(args.dataset, message=args.message)
+            print(f"snapshot #{s.id} · {s.dataset_name} · {s.content_hash[:16]}… · {len(s.manifest)} files")
+        elif args.snap_command == "list":
+            for s in store.list(args.dataset):
+                import datetime
+
+                ts = datetime.datetime.fromtimestamp(s.created_at).strftime("%Y-%m-%d %H:%M")
+                print(f"#{s.id:<3} {ts}  {s.content_hash[:16]}…  {s.message or '(no message)'}")
+        elif args.snap_command == "verify":
+            ok, expected, drift = store.verify(args.dataset)
+            if ok:
+                print(f"OK — matches snapshot {expected[:16]}…")
+                return 0
+            print(f"DRIFT vs {expected[:16]}…:")
+            for d in drift[:20]:
+                print(f"  {d}")
+            return 1
         return 0
 
     if args.command == "diff":
