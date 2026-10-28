@@ -91,6 +91,10 @@ def build_parser() -> argparse.ArgumentParser:
     ps_d.add_argument("--to", dest="to_id", type=int, default=None)
     ps_d.add_argument("--catalog", default="state/catalog.db", help="snapshot DB path")
 
+    p_rep = sub.add_parser("report", help="shareable Markdown dataset report")
+    p_rep.add_argument("dataset")
+    p_rep.add_argument("--out", default=None, help="output .md path (default <name>.report.md)")
+
     p_diff = sub.add_parser("diff", help="compare two datasets (conversion validation)")
     p_diff.add_argument("left", help="dataset A (e.g. v2.1 source)")
     p_diff.add_argument("right", help="dataset B (e.g. converted v3.0)")
@@ -302,6 +306,17 @@ def main(argv: list[str] | None = None) -> int:
             for d in drift[:20]:
                 print(f"  {d}")
             return 1
+        return 0
+
+    if args.command == "report":
+        from .qc.report import render_report
+
+        try:
+            p = render_report(args.dataset, args.out)
+        except Exception as e:  # inspect/qc both raise on invalid datasets
+            print(f"error: {e}", file=sys.stderr)
+            return 1
+        print(f"report written: {p}")
         return 0
 
     if args.command == "diff":
