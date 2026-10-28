@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>embodied-lake</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; background: #0d1117; color: #e6edf3; }
+  header { padding: 14px 22px; border-bottom: 1px solid #21262d; display: flex; align-items: baseline; gap: 12px; }
+  header h1 { font-size: 18px; margin: 0; }
+  header span { color: #8b949e; font-size: 13px; }
+  main { padding: 18px 22px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #21262d; }
+  th { color: #8b949e; font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .pass { color: #3fb950; font-weight: 600; } .fail { color: #f85149; font-weight: 600; }
+  .score { color: #d29922; }
+  a { color: #58a6ff; text-decoration: none; } a:hover { text-decoration: underline; }
+  #err { color: #f85149; padding: 12px 0; }
+  .muted { color: #8b949e; }
+  .pill { border: 1px solid #30363d; border-radius: 999px; padding: 1px 8px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>embodied-lake</h1>
+  <span>self-hosted embodied-data catalog</span>
+</header>
+<main>
+  <div id="err"></div>
+  <table>
+    <thead><tr>
+      <th>dataset</th><th>format</th><th>episodes</th><th>frames</th>
+      <th>fps</th><th>qc</th><th>score</th><th>preview</th>
+    </tr></thead>
+    <tbody id="rows"><tr><td colspan="8" class="muted">loading…</td></tr></tbody>
+  </table>
+  <p class="muted" style="font-size:12px">
+    episode previews open in the hosted Rerun web viewer; self-hosted viewer
+    embedding is on the roadmap (Phase 2).
+  </p>
+</main>
+<script>
+async function load() {
+  try {
+    const res = await fetch('/api/datasets');
+    const rows = await res.json();
+    const tb = document.getElementById('rows');
+    if (!rows.length) {
+      tb.innerHTML = '<tr><td colspan="8" class="muted">catalog empty — register a dataset: <code>elake catalog add &lt;dir&gt;</code> or POST /api/datasets</td></tr>';
+      return;
+    }
+    tb.innerHTML = rows.map(r => `
+      <tr>
+        <td><b>${esc(r.name)}</b><br><span class="muted" style="font-size:12px">${esc(r.path)}</span></td>
+        <td><span class="pill">${esc(r.version || '?')}</span></td>
+        <td>${r.episodes ?? '–'}</td>
+        <td>${r.frames ?? '–'}</td>
+        <td>${r.fps ?? '–'}</td>
+        <td class="${r.qc_ok ? 'pass' : 'fail'}">${r.qc_ok === null ? '–' : (r.qc_ok ? 'PASS' : 'FAIL')}</td>
+        <td class="score">${r.mean_score === null ? '–' : r.mean_score.toFixed(1)}</td>
+        <td><a href="https://rerun.io/viewer?url=${encodeURIComponent(location.origin + '/preview/' + encodeURIComponent(r.name) + '.rrd')}" target="_blank" rel="noopener">open ↗</a></td>
+      </tr>`).join('');
+  } catch (e) {
+    document.getElementById('err').textContent = 'failed to load catalog: ' + e;
+  }
+}
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+load();
+</script>
+</body>
+</html>

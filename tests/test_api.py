@@ -83,3 +83,10 @@ def test_post_register(api: str, tmp_path: Path) -> None:
         assert r.status == 201
     _, rows = _get(f"{api}/api/datasets")
     assert len(rows) == 2
+
+
+def test_index_served(api: str) -> None:
+    with urllib.request.urlopen(f"{api}/", timeout=5) as r:
+        body = r.read().decode()
+    assert r.status == 200
+    assert "embodied-lake" in body and "/api/datasets" in body

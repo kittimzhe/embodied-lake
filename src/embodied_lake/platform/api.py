@@ -43,6 +43,14 @@ def make_handler(catalog_dir: str | Path) -> type[BaseHTTPRequestHandler]:
 
         # ------------------------------------------------------------ #
         def do_GET(self) -> None:  # noqa: N802
+            if self.path in ("/", "/index.html"):
+                page = (Path(__file__).parent / "static" / "index.html").read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(page)))
+                self.end_headers()
+                self.wfile.write(page)
+                return None
             if self.path == "/healthz":
                 return self._json(200, {"ok": True})
             if self.path == "/api/datasets":
