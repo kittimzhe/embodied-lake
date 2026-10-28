@@ -149,3 +149,9 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
   into the constant (+HalParameters import); non-sim lanes 11/11 local
 - sim-lane failures verified pre-existing on clean master (optional deps) — not ours
 - quality trio (ruff check / format / targeted tests) before push, per lesson
+
+### r21: PUBLIC RELEASE v0.1.0 🎉
+- repo flipped public per user approval; v0.1.0 tagged + GitHub release notes
+- LeRobot #4443 Draft B posted (converter-table data point, public link now live)
+- packaging: extras aligned with reality (babel/viz/all), fresh-venv editable
+  install + elake smoke verified without PYTHONPATH
