@@ -89,3 +89,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
   z) / low_motion (dataset-median energy reference); 4 detector tests green
 - Real-data calibration: lerobot/pusht conversion output → 206/206 episodes
   score 100.0, zero false positives (clean sim benchmark)
+
+### Platform loop first cut (2026-10-28, r10) — Phase 2 started
+- `platform/catalog.py`: SQLite registry (stdlib only) — lineage, qc verdict,
+  mean score, upsert-by-path; `elake catalog add/list`
+- `elake ingest`: convert -> qc gate (exit 1 on structural failure) -> score
+  -> register, one command; 4 e2e tests (33/33 green)
+- Real-data drill: pusht conversion output registered (#1, v3.0, qc=PASS, 100.0)

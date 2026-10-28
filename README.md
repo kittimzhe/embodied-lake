@@ -36,6 +36,11 @@ elake convert mcap-to-v30 rec_*.mcap ./ds \
     --state-topic /arm/joint_states --action-topic /arm/command   # rosbag2/MCAP
 elake convert hdf5-to-v30 episode_*.hdf5 ./ds         # ALOHA-style HDF5
 
+# --- catalog & ingest: the platform loop -------------------------------------
+elake ingest rec_*.mcap ./ds --mode mcap-to-v30 --state-topic /arm/joint_states
+#            ^ convert -> structural qc gate -> score -> register (one command)
+elake catalog list                            # registry with qc verdicts + lineage
+
 # --- qc + scoring ------------------------------------------------------------
 elake qc ./ds_v30                          # structural PASS/FAIL, exit code 1 on error
 elake score ./ds_v30 --min-score 80        # content rules: frozen joints, saturation,

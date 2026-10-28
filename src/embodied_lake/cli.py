@@ -47,6 +47,27 @@ def build_parser() -> argparse.ArgumentParser:
         help="convert tabular data only; drop video features instead of failing",
     )
 
+    p_cat = sub.add_parser("catalog", help="dataset registry (local SQLite)")
+    cat_sub = p_cat.add_subparsers(dest="action", required=True)
+    p_cat_add = cat_sub.add_parser("add", help="register/refresh a dataset")
+    p_cat_add.add_argument("dataset")
+    p_cat_add.add_argument("--source", default=None, help="e.g. mcap:/path/rec.mcap")
+    p_cat_add.add_argument("--catalog", default=None, help="catalog dir (default: .elake)")
+    p_cat_ls = cat_sub.add_parser("list", help="list registered datasets")
+    p_cat_ls.add_argument("--catalog", default=None, help="catalog dir (default: .elake)")
+
+    p_ing = sub.add_parser("ingest", help="convert -> qc -> score -> catalog, one command")
+    p_ing.add_argument("src", nargs="+")
+    p_ing.add_argument("dst")
+    p_ing.add_argument("--mode", required=True, choices=["v21-to-v30", "mcap-to-v30", "hdf5-to-v30"])
+    p_ing.add_argument("--state-topic", default=None)
+    p_ing.add_argument("--action-topic", default=None)
+    p_ing.add_argument("--task", default=None)
+    p_ing.add_argument("--fps", type=int, default=None)
+    p_ing.add_argument("--drop-videos", action="store_true")
+    p_ing.add_argument("--no-score", action="store_true")
+    p_ing.add_argument("--catalog", default=None, help="catalog dir (default: .elake)")
+
     p_score = sub.add_parser("score", help="content-level quality scoring (rules)")
     p_score.add_argument("src", help="local v3.0 dataset directory")
     p_score.add_argument("--json-out", default=None, help="write full report JSON here")
@@ -113,6 +134,84 @@ def main(argv: list[str] | None = None) -> int:
             )
         else:
             print(render(card))
+        return 0
+
+    if args.command == "catalog":
+        from .platform.catalog import Catalog
+
+        cat_dir = Path(args.catalog or ".elake")
+        cat = Catalog(cat_dir)
+        try:
+            if args.action == "add":
+                entry = cat.register(args.dataset, source=getattr(args, "source", None))
+                print(f"registered #{entry.id}: {entry.name} ({entry.version}, "
+                      f"qc={'PASS' if entry.qc_ok else 'FAIL'}, score={entry.mean_score})")
+                return 0
+            if args.action == "list":
+                rows = cat.list()
+                if not rows:
+                    print("(catalog empty)")
+                for e in rows:
+                    print(f"#{e.id:<3} {e.name:<28} {e.version:<6} eps={e.episodes:<5} "
+                          f"frames={e.frames:<7} qc={'PASS' if e.qc_ok else 'FAIL':<4} "
+                          f"score={e.mean_score if e.mean_score is not None else '-'}")
+                return 0
+        finally:
+            cat.close()
+
+    if args.command == "ingest":
+        from .platform.catalog import Catalog
+
+        lineage: dict = {"mode": args.mode}
+        # 1) convert
+        if args.mode == "v21-to-v30":
+            from .babel.v21_to_v30 import convert_v21_to_v30
+
+            report = convert_v21_to_v30(args.src[0], args.dst, drop_videos=args.drop_videos)
+            lineage["source"] = args.src[0]
+            lineage["converter"] = "v21_to_v30"
+            print(f"converted: {report.episodes} episodes / {report.frames} frames")
+        elif args.mode == "mcap-to-v30":
+            from .babel.mcap_to_lerobot import McapMapping, convert_mcap_to_v30
+
+            mapping = McapMapping(
+                state_topic=args.state_topic or "",
+                action_topic=args.action_topic,
+                task=args.task or "demonstration",
+                fps=args.fps or 30,
+            )
+            rep = convert_mcap_to_v30(args.src, args.dst, mapping)
+            lineage.update({"source": ",".join(args.src), "converter": "mcap_to_v30",
+                            "state_topic": args.state_topic})
+            print(f"converted: {rep.episodes} episodes / {rep.frames} frames")
+        else:
+            from .babel.aloha_to_lerobot import AlohaMapping, convert_aloha_to_v30
+
+            mapping = AlohaMapping(task=args.task or "manipulation demo", fps=args.fps or 50)
+            rep = convert_aloha_to_v30(args.src, args.dst, mapping)
+            lineage.update({"source": ",".join(args.src), "converter": "aloha_to_v30"})
+            print(f"converted: {rep.episodes} episodes / {rep.frames} frames")
+
+        # 2) structural qc gate
+        from .qc.structural import qc_dataset
+
+        qc = qc_dataset(args.dst)
+        for issue in qc.issues:
+            print(str(issue))
+        print(qc.summary())
+        if not qc.ok:
+            return 1
+
+        # 3) scoring + 4) catalog
+        cat = Catalog(Path(args.catalog or ".elake"))
+        try:
+            entry = cat.register(
+                args.dst, source=lineage.get("source"), lineage=lineage,
+                with_scoring=not args.no_score,
+            )
+        finally:
+            cat.close()
+        print(f"registered #{entry.id}: {entry.name} qc=PASS score={entry.mean_score}")
         return 0
 
     if args.command == "score":
