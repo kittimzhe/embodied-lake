@@ -73,6 +73,15 @@ elake score ./ds_v30 --min-score 80        # content rules: frozen joints, satur
 
 ## Validated against real data
 
+**Dataset #2 — `lerobot/aloha_sim_transfer_cube_human`** (50 eps / 20,000 frames,
+14-DoF bimanual): same treatment — tasks, episodes metadata (49 cols), per-episode
+tabular stats (45 cols), aggregate stats, and **all 20,000 data rows × 8 columns
+value-identical** against the official v3.0. Two real-world findings surfaced by
+this run, now handled: official datasets disagree on the tasks column name
+(`task` vs `__index_level_0__` — `elake diff` reads both), and shard boundaries
+differ when videos are dropped (tabular-only output legitimately packs into
+fewer size-bounded files; the row set is identical).
+
 The v2.1→v3.0 converter's output was compared, artifact by artifact, with the
 **official** v3.0 conversion of [`lerobot/pusht`](https://huggingface.co/datasets/lerobot/pusht)
 (206 episodes / 25,650 frames) on the Hub:

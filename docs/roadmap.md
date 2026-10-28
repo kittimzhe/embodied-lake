@@ -176,3 +176,12 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - PR 451: warning commit re-shifted 01-hal.md line markers (6 stale) →
   refreshed + full pre-push quartet (ruff/ruff fmt/markers/targeted tests);
   321 passed locally across both suites
+
+### r27: second real-dataset equivalence (aloha_sim_transfer_cube_human)
+- full pipeline: convert(0.7s) → qc PASS → score 100.0 → source-diff IDENTICAL
+- vs OFFICIAL v3.0: episodes stats 45 cols ✅, stats.json ✅, tasks ✅(语义),
+  global 20,000×8 rows value-identical ✅
+- findings: (a) official tasks column name inconsistent across datasets
+  (task vs __index_level_0__) — our diff/inspect tolerate both;
+  (b) drop-videos changes shard boundaries legitimately (row set identical)
+- related-work note added to #5130 (lerobot-doctor)
