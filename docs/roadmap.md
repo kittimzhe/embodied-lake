@@ -233,3 +233,16 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - 合并 PR 计数:0/3 — 唯一未达项,取决于外部维护者动作(时窗:天-周级),
   本会话内无法自主推进;全部材料就绪,回应即转 PR
 - 交接:embodied-lake-交接终稿.md(五节,含终版清单)+ 证据链底稿(A-I 节)
+
+### r41(2026-11-17): #451 MERGED + #5130 review delivered + AgiBot coverage map
+- OpenRAL #451 MERGED 2026-11-12 (merge PR 计数 1/3;README "Merged upstream" 已加)
+- LeRobot #5130:co-author 接受 + 完整 review 交付:
+  * 跑通其分支(fixture→convert→self-check)
+  * 独立 QC/评分 PASS 100/100
+  * 双实现交叉验证:90 行 × 7 列完全一致
+  * 实质发现:lerobot stats=直方图近似分位数,精确分位数工具会 diff——
+    "stats 键集"必要不充分,估计方法也是契约的一部分
+  * 2 nits(fixture 目录冲突/尾帧前向填充)
+- AgiBot #164 覆盖图谱:7/7 任务四元数缺陷(~55k 帧),ee_camera 全中,
+  action.* 镜像一致;5 任务如实记未扫;sweep_agibot.py + JSON 入库
+- README 增补跨工具 stats 发现
