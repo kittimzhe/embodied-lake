@@ -82,6 +82,12 @@ elake score ./ds_v30 --min-score 80        # content rules: frozen joints, satur
 
 ## Validated against real data
 
+**Cross-tool stats finding**: lerobot's `compute_array_stats` estimates quantiles
+from histograms (≈5000 bins), so exact-quantile implementations (e.g. ours,
+`np.quantile`) differ slightly **on identical data** — verified during a
+cross-converter validation (90 rows × 7 cols value-identical while q10/q50/q90/q99
+differed). Don't byte-compare stats across tools when validating conversions.
+
 **Dataset #2 — `lerobot/aloha_sim_transfer_cube_human`** (50 eps / 20,000 frames,
 14-DoF bimanual): same treatment — tasks, episodes metadata (49 cols), per-episode
 tabular stats (45 cols), aggregate stats, and **all 20,000 data rows × 8 columns
