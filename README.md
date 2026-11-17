@@ -4,6 +4,10 @@
 [![release](https://img.shields.io/badge/release-v0.1.3-blue)](https://github.com/kittimzhe/embodied-lake/releases/tag/v0.1.3)
 [![license](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
+## Merged upstream
+
+- **[OpenRAL/openral#451](https://github.com/OpenRAL/openral/pull/451)** — `fix(hal)!: AlohaHAL speaks the xs_sdk wire contract` (merged 2026-11-12; +549/−495). Fix for help-wanted [#250](https://github.com/OpenRAL/openral/issues/250): ALOHA HAL topics/messages now match what real robots expose (`JointGroupCommand` arm + `JointSingleCommand` gripper), with fail-loud config validation. Co-developed with maintainer @AdrianLlopart.
+
 > LeRobot-native, self-hostable data platform for embodied AI — an open alternative to the (closed-source) Foxglove Data Platform, built on the [LeRobot dataset format](https://huggingface.co/docs/lerobot/lerobot-dataset-v3) (the de-facto standard: 5,750+ datasets on the Hugging Face Hub) and [Rerun](https://github.com/rerun-io/rerun) as the multimodal data layer.
 
 **Status: Phase 2 complete — Babel layer + QC + self-hosted management (catalog, snapshots, web UI). Phase 3 (dataset intelligence) underway.** See [docs/roadmap.md](docs/roadmap.md).
