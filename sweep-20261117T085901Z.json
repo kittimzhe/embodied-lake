@@ -1,0 +1,124 @@
+[
+ {
+  "task": "604",
+  "ok": true,
+  "seconds": 17,
+  "qc": "qc: PASS (0 issue(s))",
+  "score": "score: mean 0.0 over 49 episodes; 49 with findings",
+  "quaternion_findings": [],
+  "frozen_dims": [
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 7474 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 7474 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 7474 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 7474 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 7474 frames"
+  ]
+ },
+ {
+  "task": "727",
+  "ok": true,
+  "seconds": 32,
+  "qc": "qc: PASS (0 issue(s))",
+  "score": "score: mean 0.0 over 114 episodes; 114 with findings",
+  "quaternion_findings": [],
+  "frozen_dims": [
+   "observation.state.gripper: dims [0, 1] never change over 8696 frames",
+   "observation.state.robot_velocity: dims [0, 1, 2] never change over 8696 frames",
+   "observation.state.gripper: dims [0, 1] never change over 8696 frames",
+   "observation.state.robot_velocity: dims [0, 1, 2] never change over 8696 frames",
+   "observation.state.gripper: dims [0, 1] never change over 8696 frames",
+   "observation.state.robot_velocity: dims [0, 1, 2] never change over 8696 frames"
+  ]
+ },
+ {
+  "task": "568",
+  "ok": true,
+  "seconds": 8,
+  "qc": "qc: PASS (0 issue(s))",
+  "score": "score: mean 0.0 over 16 episodes; 16 with findings",
+  "quaternion_findings": [],
+  "frozen_dims": [
+   "observation.state.gripper: dims [0] never change over 2277 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 2277 frames",
+   "observation.state.gripper: dims [0] never change over 2277 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 2277 frames",
+   "observation.state.gripper: dims [0] never change over 2277 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 2277 frames"
+  ]
+ },
+ {
+  "task": "719",
+  "ok": true,
+  "seconds": 32,
+  "qc": "qc: PASS (0 issue(s))",
+  "score": "score: mean 0.0 over 88 episodes; 88 with findings",
+  "quaternion_findings": [],
+  "frozen_dims": [
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 11130 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 11130 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 11130 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 11130 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 11130 frames"
+  ]
+ },
+ {
+  "task": "619",
+  "ok": false,
+  "seconds": 240,
+  "qc": "",
+  "score": "",
+  "quaternion_findings": [],
+  "frozen_dims": []
+ },
+ {
+  "task": "730",
+  "ok": false,
+  "seconds": 240,
+  "qc": "",
+  "score": "",
+  "quaternion_findings": [],
+  "frozen_dims": []
+ },
+ {
+  "task": "737",
+  "ok": true,
+  "seconds": 70,
+  "qc": "qc: PASS (0 issue(s))",
+  "score": "score: mean 0.0 over 82 episodes; 82 with findings",
+  "quaternion_findings": [],
+  "frozen_dims": [
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 24034 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 24034 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 24034 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 24034 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 24034 frames"
+  ]
+ },
+ {
+  "task": "429",
+  "ok": false,
+  "seconds": 80,
+  "qc": "",
+  "score": "",
+  "quaternion_findings": [],
+  "frozen_dims": []
+ },
+ {
+  "task": "446",
+  "ok": false,
+  "seconds": 240,
+  "qc": "",
+  "score": "",
+  "quaternion_findings": [],
+  "frozen_dims": []
+ },
+ {
+  "task": "677",
+  "ok": false,
+  "seconds": 240,
+  "qc": "",
+  "score": "",
+  "quaternion_findings": [],
+  "frozen_dims": []
+ }
+]
