@@ -252,3 +252,17 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
   镜像分支代开 PR(作者署名归其 + 双向 Co-authored-by)
 - diff 工具改进:quantile 键差异时提示估计方法差异(lerobot 直方图近似
   vs np.quantile 精确),指向 data rows 为真值 — 5130 真实案例验证
+
+### r43(2026-11-18 下午): fix-anchor 协议确立
+- PHM-Audit 认可覆盖度足够("7/7 pre-fix → 0/7 post-fix 是本 issue 最强收官"),
+  明确下一步 = 冻结基线
+- baselines/agibot-164/:快照 JSON + 规则集/阈值 + 逐任务基线表 + 复扫协议
+  (含通过判据与"未命中通道豁免"细则)已冻结入仓
+- 协议确认评论已发;5 个未扫任务 900s 超时后台补扫中
+
+### r43(2026-11-18 下午): fix-anchor 协议确立
+- PHM-Audit 认可覆盖度足够("7/7 pre-fix → 0/7 post-fix 是本 issue 最强收官"),
+  明确下一步 = 冻结基线
+- baselines/agibot-164/:快照 JSON + 规则集/阈值 + 逐任务基线表 + 复扫协议
+  (含通过判据与"未命中通道豁免"细则)已冻结入仓
+- 协议确认评论已发;5 个未扫任务 900s 超时后台补扫中
