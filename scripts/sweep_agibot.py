@@ -7,6 +7,7 @@ Writes sweep-<ts>.json next to cwd with per-task summaries.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import time
@@ -14,7 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 URL = "https://huggingface.co/datasets/OpenWAM/AgiBotWorld-Beta/resolve/main/{task}.tar.gz"
-TIMEOUT_S = 240
+TIMEOUT_S = int(os.environ.get("SWEEP_TIMEOUT", "240"))
 
 
 def sweep(tasks: list[str]) -> list[dict]:
@@ -24,18 +25,13 @@ def sweep(tasks: list[str]) -> list[dict]:
     results = []
     for t in tasks:
         dst = out_dir / t
-        if (dst / "meta").is_dir() and any((dst / "data").glob("**/*.parquet")):
-            print(f"[{t}] cached", flush=True)
-            args = ["str(dst)"]  # placeholder, rerun scoring below via validator --out
-            cmd = [
-                str(root / ".venv/bin/python"), str(root / "scripts/validate_hub_tarball.py"),
-                URL.format(task=t), "--out", str(dst),
-            ]
-        else:
-            cmd = [
-                str(root / ".venv/bin/python"), str(root / "scripts/validate_hub_tarball.py"),
-                URL.format(task=t), "--out", str(dst),
-            ]
+        if dst.exists():  # a previous failed run may leave partial extraction
+            import shutil
+            shutil.rmtree(dst)
+        cmd = [
+            str(root / ".venv/bin/python"), str(root / "scripts/validate_hub_tarball.py"),
+            URL.format(task=t), "--out", str(dst),
+        ]
         t0 = time.time()
         try:
             p = subprocess.run(cmd, capture_output=True, text=True, timeout=TIMEOUT_S)
