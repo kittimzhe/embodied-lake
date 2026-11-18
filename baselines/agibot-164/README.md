@@ -37,9 +37,14 @@ streaming budget; v2 re-ran 619/429 successfully with a larger cap).
    `python scripts/validate_hub_tarball.py <task>.tar.gz --out /tmp/<task>_post`
 2. Same rule-set, same thresholds, same sub-episode frame sets (tabular head
    extraction is deterministic on a tarball's member order).
-3. Pass criterion per task: zero `quaternion_nonunit` findings on channels
-   hit in the baseline above (channels NOT hit in the baseline are exempt
-   from the 0/7 claim if they were legitimately unit-norm pre-fix).
+3. Pass criterion per task, per channel (pre-registered, amended 2026-11-18
+   per @PHM-Audit's physical criterion — stricter than "no finding"):
+   - **unit band restored**: median |norm − 1| ≤ 1e-3
+   - **residual**: 1e-3 < median |norm − 1| ≤ 1e-2 (improved, not fully corrected)
+   - **uncorrected**: median |norm − 1| > 1e-2
+   A channel hit in the baseline that lands in `residual` or `uncorrected`
+   post-fix is a first signal its reference was not fully corrected, even if
+   the rule no longer fires. Channels not hit in the baseline are exempt.
 
 Rule-set changes (if any) require re-running the pre-fix baseline on the
 pre-fix tarballs for a like-for-like comparison.
