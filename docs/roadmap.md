@@ -246,3 +246,9 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - AgiBot #164 覆盖图谱:7/7 任务四元数缺陷(~55k 帧),ee_camera 全中,
   action.* 镜像一致;5 任务如实记未扫;sweep_agibot.py + JSON 入库
 - README 增补跨工具 stats 发现
+
+### r42(2026-11-18): #5130 解锁提议 + diff 分位数提示
+- #5130:akushonkamen 开不了 PR(FORBIDDEN)→ 经用户批准发问:是否由我们
+  镜像分支代开 PR(作者署名归其 + 双向 Co-authored-by)
+- diff 工具改进:quantile 键差异时提示估计方法差异(lerobot 直方图近似
+  vs np.quantile 精确),指向 data rows 为真值 — 5130 真实案例验证

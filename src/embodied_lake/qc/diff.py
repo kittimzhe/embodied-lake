@@ -177,9 +177,13 @@ def diff_datasets(a: str | Path, b: str | Path, *, expect_migration: bool = Fals
             for stat in set(agg_pair[0][feat]) & set(agg_pair[1][feat]):
                 if not _close(agg_pair[0][feat][stat], agg_pair[1][feat][stat]):
                     bad.append(f"{feat}.{stat}")
-        report.sections.append(
-            SectionResult("stats.json", not bad, f"bad: {bad}" if bad else "aggregate matches")
-        )
+        msg = f"bad: {bad}" if bad else "aggregate matches"
+        if bad and any(".q" in b for b in bad):
+            msg += (" — quantile-key diffs often reflect estimation-method divergence, "
+                    "not data differences (lerobot uses histogram-based approximate "
+                    "quantiles; np.quantile-style tools differ slightly on identical "
+                    "rows). Compare the data-rows section for ground truth.")
+        report.sections.append(SectionResult("stats.json", not bad, msg))
     else:
         report.sections.append(SectionResult("stats.json", True, "not present on both sides"))
 
