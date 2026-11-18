@@ -23,9 +23,13 @@ Baseline for the fix-anchor protocol proposed by @PHM-Audit on
 | 568  | ee_camera (1.236) | 2,277/2,277 |
 | 719  | ee_base (1.007) · ee_camera (1.274) | 9,795/11,130 · 11,130/11,130 |
 | 737  | ee_camera (1.277) | 24,034/24,034 |
+| 619  | ee_base (1.004) · ee_camera (1.185) | 29,904/36,080 · 36,080/36,080 |
+| 429  | ee_base (1.002) · ee_camera (1.324) | 14,828/25,758 · 25,758/25,758 |
 
-Unscanned (not clean): 619, 730, 446, 677, 429 — see `prefix-sweep.json`
-failure records (4 streaming timeouts, 1 truncated stream).
+Unscanned (not clean): 730, 446, 677 — see failure records in
+`prefix-sweep.json` / `prefix-sweep-v2.json` (data sections exceeding the
+streaming budget; v2 re-ran 619/429 successfully with a larger cap).
+**Running total: 9/9 scanned tasks affected, ~117,000 frames.**
 
 ## Post-fix re-score protocol
 

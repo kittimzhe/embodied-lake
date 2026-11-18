@@ -1,0 +1,59 @@
+[
+ {
+  "task": "619",
+  "ok": true,
+  "seconds": 643,
+  "qc": "qc: PASS (0 issue(s))",
+  "score": "score: mean 0.0 over 376 episodes; 376 with findings",
+  "quaternion_findings": [],
+  "frozen_dims": [
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 36080 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 36080 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 36080 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 36080 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 36080 frames"
+  ]
+ },
+ {
+  "task": "730",
+  "ok": false,
+  "seconds": 900,
+  "qc": "",
+  "score": "",
+  "quaternion_findings": [],
+  "frozen_dims": []
+ },
+ {
+  "task": "446",
+  "ok": false,
+  "seconds": 3357,
+  "qc": "",
+  "score": "",
+  "quaternion_findings": [],
+  "frozen_dims": []
+ },
+ {
+  "task": "677",
+  "ok": false,
+  "seconds": 965,
+  "qc": "",
+  "score": "",
+  "quaternion_findings": [],
+  "frozen_dims": []
+ },
+ {
+  "task": "429",
+  "ok": true,
+  "seconds": 1943,
+  "qc": "qc: PASS (0 issue(s))",
+  "score": "score: mean 0.0 over 138 episodes; 138 with findings",
+  "quaternion_findings": [],
+  "frozen_dims": [
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 25758 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 25758 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 25758 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 25758 frames",
+   "observation.state.dex: dims [0, 1, 2, 3, 4, 5, 6, 7] never change over 25758 frames"
+  ]
+ }
+]
