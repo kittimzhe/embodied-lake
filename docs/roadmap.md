@@ -274,3 +274,10 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - baselines/agibot-164 v2 冻结;#164 增补评论已发
 - 教训:subprocess timeout 管道排空陷阱(子进程杀掉后 communicate 仍等
   孙进程持有管道)→ 手杀解困;大任务部分提取目录必须清除防误判
+
+### r45(2026-11-18 晚): 预注册物理判据采纳
+- PHM-Audit 提出更严的修复验收:中位数范数须回单位带(≤1e-3),
+  三档判定(unit band restored / residual / uncorrected)替代"无 finding"
+- 数据精化:ee_base 紧带实为 5/6(1.0018-1.0072),727=1.0500 为孤立离群
+  — 协议按三档判据修订入仓并回帖确认
+- 等待:上游修复 tarball(同日复扫)
