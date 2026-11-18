@@ -266,3 +266,11 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - baselines/agibot-164/:快照 JSON + 规则集/阈值 + 逐任务基线表 + 复扫协议
   (含通过判据与"未命中通道豁免"细则)已冻结入仓
 - 协议确认评论已发;5 个未扫任务 900s 超时后台补扫中
+
+### r44(2026-11-18 下午): v2 覆盖 9/9 + 基线冻结完成
+- 补扫:619(376 子集,36,080 帧)+429(138 子集,25,758 帧)均命中
+- **9/9 任务命中,~117k 帧**;ee_camera 9/9;ee_base 6/9 且命中时中位数
+  紧聚 1.002-1.007(疑似另一(亦不完美的)归一化参照)
+- baselines/agibot-164 v2 冻结;#164 增补评论已发
+- 教训:subprocess timeout 管道排空陷阱(子进程杀掉后 communicate 仍等
+  孙进程持有管道)→ 手杀解困;大任务部分提取目录必须清除防误判
