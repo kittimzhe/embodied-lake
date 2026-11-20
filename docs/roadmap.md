@@ -298,3 +298,12 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - 端到端测量揭示精确边界:语义对齐 ✓,字节对齐 ✗(lerobot 逐集直方图噪声
   ~2.6% 穿过包络:0.65 精确 vs 0.6334 直方图)— 复刻估计器=复制噪声,不做
 - 51/52 测试(新 envelope 单测含语义+边界断言)
+
+### r48(2026-11-20 晚): rerun#12984 原作者回应 + CLI 全景审计
+- Dragolex(原作者)11-06 确认我们的生成期前缀与他们的实践一致;真痛点
+  =预计算 RRD 无原始数据的事后对比
+- 审计 0.43 CLI/SDK:filter=只删/route=只改id/merge=碰撞仍在/SDK 无读 API
+  → 今天确实无前缀路径;关键洞察:route 已做免解码元数据改写 → 机制半成,
+  route --entity-prefix 与 viewer 端 namespace-on-load 皆与现设计一致
+- 回帖(带审计表格+验收场景承诺);rerun rrd compare 顺带入库为我们的
+  preview/compare 验证候选工具
