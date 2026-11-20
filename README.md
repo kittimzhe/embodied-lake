@@ -1,7 +1,7 @@
 # embodied-lake (working title)
 
 [![CI](https://github.com/kittimzhe/embodied-lake/actions/workflows/ci.yml/badge.svg)](https://github.com/kittimzhe/embodied-lake/actions/workflows/ci.yml)
-[![release](https://img.shields.io/badge/release-v0.1.3-blue)](https://github.com/kittimzhe/embodied-lake/releases/tag/v0.1.3)
+[![release](https://img.shields.io/badge/release-v0.1.4-blue)](https://github.com/kittimzhe/embodied-lake/releases/tag/v0.1.4)
 [![license](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
 ## Merged upstream
