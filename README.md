@@ -87,7 +87,7 @@ elake score ./ds_v30 --min-score 80        # content rules: frozen joints, satur
 lerobot#3804/#4156), not global quantile estimates: on a 2-episode validation
 ramp the stored q50 was 36% below the true merged-data median, while data rows
 matched value-identically (90×7) and mean/std were bit-identical. We keep exact
-global quantiles; don't byte-compare aggregate quantiles across tools — compare
+global quantiles by default; `--stats-aggregate envelope` emits lerobot#3804-compatible aggregate *semantics* (cross-episode bounds for q*, frame count) — semantic, not byte, parity: lerobot's per-episode histogram noise (~2–3%) passes through the envelope. Don't byte-compare aggregate quantiles across tools — compare
 data rows.
 
 **Dataset #2 — `lerobot/aloha_sim_transfer_cube_human`** (50 eps / 20,000 frames,
