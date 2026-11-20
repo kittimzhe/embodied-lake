@@ -48,6 +48,7 @@ class McapMapping:
     task: str = "demonstration"
     fps: int = 30
     robot_type: str | None = None
+    stats_aggregate: str = "exact"  # exact | envelope (lerobot#3804 parity)
 
 
 @dataclass
@@ -146,6 +147,8 @@ def convert_mcap_to_v30(
 
     all_state: list[np.ndarray] = []
     all_action: list[np.ndarray] = []
+    ep_state_stats: list[dict] = []
+    ep_action_stats: list[dict] = []
     episodes_meta: list[dict] = []
     global_index = 0
 
@@ -172,6 +175,8 @@ def convert_mcap_to_v30(
         length = len(state_stream)
         all_state.append(state)
         all_action.append(action)
+        ep_state_stats.append(_v30.compute_feature_stats(state))
+        ep_action_stats.append(_v30.compute_feature_stats(action))
 
         frames_tbl = pa.table(
             {
@@ -218,11 +223,18 @@ def convert_mcap_to_v30(
     # ---- meta artifacts ---------------------------------------------------- #
     _v30.write_tasks(target, [mapping.task])
     _v30.write_episodes(target, episodes_meta)
+    def _agg(arrays, ep_stats):
+        overall = _v30.compute_feature_stats(np.concatenate(arrays))
+        if mapping.stats_aggregate == "envelope":
+            frames = sum(a.shape[0] for a in arrays)
+            return _v30.envelope_aggregate(overall, ep_stats, frames)
+        return overall
+
     _v30.write_stats(
         target,
         {
-            "observation.state": _v30.compute_feature_stats(np.concatenate(all_state)),
-            "action": _v30.compute_feature_stats(np.concatenate(all_action)),
+            "observation.state": _agg(all_state, ep_state_stats),
+            "action": _agg(all_action, ep_action_stats),
         },
     )
     dim = int(all_state[0].shape[1])

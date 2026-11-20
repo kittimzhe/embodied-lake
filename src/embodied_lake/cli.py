@@ -121,6 +121,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_mcap.add_argument("src", nargs="+", help="one or more .mcap files (one episode each)")
     p_mcap.add_argument("dst", help="destination dataset directory (v3.0)")
     p_mcap.add_argument("--state-topic", required=True, help="topic providing observation.state")
+    p_mcap.add_argument("--stats-aggregate", choices=["exact", "envelope"], default="exact",
+                        help="envelope: lerobot#3804 parity (cross-episode bounds for q*, frames for count)")
     p_mcap.add_argument("--action-topic", default=None, help="topic providing action (default: mirror state)")
     p_mcap.add_argument("--state-field", default="position", help="message field to extract (default: position)")
     p_mcap.add_argument("--task", default="demonstration", help="task label for all episodes")
@@ -221,6 +223,7 @@ def main(argv: list[str] | None = None) -> int:
                 action_topic=args.action_topic,
                 task=args.task or "demonstration",
                 fps=args.fps or 30,
+                stats_aggregate=getattr(args, "stats_aggregate", "exact"),
             )
             rep = convert_mcap_to_v30(args.src, args.dst, mapping)
             lineage.update({"source": ",".join(args.src), "converter": "mcap_to_v30",
@@ -410,6 +413,7 @@ def main(argv: list[str] | None = None) -> int:
             task=args.task,
             fps=args.fps,
             robot_type=args.robot_type,
+            stats_aggregate=args.stats_aggregate,
         )
         try:
             report = convert_mcap_to_v30(args.src, args.dst, mapping)

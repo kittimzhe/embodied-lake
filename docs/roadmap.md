@@ -290,3 +290,11 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - 上游已知(#4156/#3801/#3804)→ 不发重复 issue;#5130 跟评给出精化
   机制与文档建议;README 更正为"包络语义"精确表述
 - count 语义:我们=元素数,lerobot=帧数(另一互操作注意点)
+
+### r47(2026-11-20 晚): envelope 聚合模式落地
+- babel/_v30.envelope_aggregate:q≤50 跨集 min / q>50 跨集 max(lerobot#3804
+  语义),mean/std 保持精确,count=帧数
+- MCAP 转换器 --stats-aggregate {exact,envelope}(默认 exact);CLI 双路径接线
+- 端到端测量揭示精确边界:语义对齐 ✓,字节对齐 ✗(lerobot 逐集直方图噪声
+  ~2.6% 穿过包络:0.65 精确 vs 0.6334 直方图)— 复刻估计器=复制噪声,不做
+- 51/52 测试(新 envelope 单测含语义+边界断言)

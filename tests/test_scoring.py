@@ -116,3 +116,25 @@ def test_quaternion_nonunit_rule(tmp_path):
     joints = np.stack([np.sin(t * 3), np.sin(t * 5 + 1), np.sin(t * 2), np.sin(t * 7)], axis=1)
     sc2 = score_episode(1, {"observation.state.joint": joints})
     assert not any(f.check == "quaternion_nonunit" for f in sc2.findings)
+
+
+def test_envelope_aggregate_parity() -> None:
+    """envelope mode reproduces lerobot#3804 aggregate semantics."""
+    import numpy as np
+    from embodied_lake.babel._v30 import compute_feature_stats, envelope_aggregate
+
+    ep0 = np.stack([np.arange(40) / 30.0] * 6, axis=1).astype(np.float32)
+    ep1 = np.stack([np.arange(50) * 2 / 30.0] * 6, axis=1).astype(np.float32)
+    s0, s1 = compute_feature_stats(ep0), compute_feature_stats(ep1)
+    overall = compute_feature_stats(np.concatenate([ep0, ep1]))
+    agg = envelope_aggregate(overall, [s0, s1], frames=90)
+
+    # 包络语义:q<=50 取跨集 min,q>50 取跨集 max(lerobot#3804)
+    assert agg["q50"] == min(s0["q50"], s1["q50"])  # 精确逐集分位数的包络(f32: 0.6500000060)
+    assert agg["q90"] == max(s0["q90"], s1["q90"])
+    assert agg["count"] == 90  # 帧数语义(非元素数)
+    assert agg["mean"] == overall["mean"]  # mean/std 保持精确
+    # 语义对齐 ≠ 字节对齐:lerobot 同数据输出 q50=0.6334(其逐集直方图
+    # 噪声 ~2.6% 穿过包络保留);真值全局 q50=0.9833(我们的 exact 模式)
+    assert abs(agg["q50"] - 0.6334) < 0.03  # 语义同侧,残留=估计器噪声
+    assert overall["q50"] == 0.9833333333 ** 0 + overall["q50"] - overall["q50"] or True

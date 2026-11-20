@@ -39,6 +39,25 @@ def compute_feature_stats(values: np.ndarray) -> dict:
     return stats
 
 
+def envelope_aggregate(overall: dict, per_episode: list[dict], frames: int) -> dict:
+    """lerobot#3804-style aggregate quantiles over per-episode stats.
+
+    Exact global quantiles cannot be recovered from per-episode summaries, so
+    lerobot's ``aggregate_feature_stats`` keeps a conservative cross-episode
+    envelope: min for q <= 50, max for q > 50. min/max/mean/std stay exact
+    (weighted formulas are exact for these), and ``count`` counts FRAMES per
+    dim (not flattened elements). Emitting this shape makes our stats.json
+    directly comparable against datasets written by lerobot's own tooling;
+    pass-through ``"exact"`` keeps true global quantiles (the default).
+    """
+    agg = {k: overall[k] for k in ("min", "max", "mean", "std")}
+    agg["count"] = frames
+    for name, q in QUANTILES.items():
+        vals = [s[name] for s in per_episode]
+        agg[name] = min(vals) if q <= 0.5 else max(vals)
+    return agg
+
+
 def write_tasks(root: Path, tasks: list[str]) -> None:
     """Upstream-compatible tasks.parquet (task strings as named pandas index)."""
     import pandas as pd
