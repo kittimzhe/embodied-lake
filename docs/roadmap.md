@@ -281,3 +281,12 @@ Each phase lists deliverables, resume points, and upstream-contribution links.
 - 数据精化:ee_base 紧带实为 5/6(1.0018-1.0072),727=1.0500 为孤立离群
   — 协议按三档判据修订入仓并回帖确认
 - 等待:上游修复 tarball(同日复扫)
+
+### r46(2026-11-20): stats 差异根因闭环 + 上游已知性确认
+- 定量诊断:per-episode 直方图分位数≈真值(1.7% 内);偏差主体在
+  aggregate_feature_stats 的**跨集包络**(min for q≤50 / max for q>50,
+  lerobot#3804 针对无法从摘要恢复全局分位数而设计的保守界)
+- 真值对照:我们精确法 q50=0.9833=真值;lerobot 聚合 0.6334(-36%)
+- 上游已知(#4156/#3801/#3804)→ 不发重复 issue;#5130 跟评给出精化
+  机制与文档建议;README 更正为"包络语义"精确表述
+- count 语义:我们=元素数,lerobot=帧数(另一互操作注意点)
