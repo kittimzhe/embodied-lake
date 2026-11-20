@@ -6,6 +6,35 @@ adherence to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starts a
 
 ## [Unreleased]
 
+## [0.1.4] — 2026-11-20
+
+*Interoperability & validation-infrastructure release.*
+
+### Added
+- **`--stats-aggregate envelope`** (MCAP converter): emits lerobot#3804-compatible
+  aggregate stats semantics — cross-episode bounds for quantiles (min for q≤50,
+  max for q>50), frame-count `count`, exact mean/std. Semantic, not byte, parity:
+  lerobot's per-episode histogram noise (~2–3%) passes through the envelope
+  (measured 0.650 exact vs 0.6334 lerobot on a controlled fixture); default stays
+  `exact` (true global quantiles).
+- **`baselines/agibot-164/`**: frozen pre-fix baseline for the AgiBotWorld-Beta
+  quaternion findings (9/9 tasks affected, ~117k frames), with a pre-registered
+  three-band post-fix criterion (unit band restored ≤1e-3 / residual / uncorrected)
+  and a deterministic re-score protocol. Fix-anchor for
+  [OpenDriveLab/AgiBot-World#164](https://github.com/OpenDriveLab/AgiBot-World/issues/164).
+- **`scripts/sweep_agibot.py`**: corpus sweep driver (env-tunable streaming budget,
+  partial-extraction purge). Produced the 9-task coverage map above.
+
+### Changed
+- `elake diff` annotates quantile-only stats diffs with the estimation-method
+  divergence note and points at data rows as ground truth.
+- README: cross-tool stats section documents the envelope semantics precisely
+  (initially reported as "histogram vs exact", root-caused to the deliberate
+  cross-episode bound in `aggregate_feature_stats`); "Merged upstream" section
+  records OpenRAL#451.
+
+## [0.1.3] — 2026-10-28
+
 ## [0.1.3] — 2026-10-28
 
 ### Fixed (all caught by a container e2e re-drill)
